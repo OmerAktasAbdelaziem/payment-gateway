@@ -26,9 +26,11 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 // Import routes
 const paymentRoutes = require('./routes/payment');
+const syncRoutes = require('./routes/sync');
 
 // Routes
 app.use('/api', paymentRoutes);
+app.use('/api', syncRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

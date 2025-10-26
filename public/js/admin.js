@@ -2,6 +2,32 @@
 let allPayments = [];
 let generatedPaymentUrl = '';
 
+// Sync Stripe transactions
+async function syncStripeTransactions() {
+    try {
+        const response = await fetch('/api/sync-stripe', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(`✅ Sync Complete!\n\nNew: ${result.synced}\nUpdated: ${result.updated}\nTotal: ${result.total}`);
+            // Refresh data
+            loadDashboard();
+            loadPayments();
+        } else {
+            alert(`❌ Sync Failed: ${result.error}`);
+        }
+    } catch (error) {
+        console.error('Sync error:', error);
+        alert('❌ Failed to sync Stripe transactions');
+    }
+}
+
 // Initialize dashboard
 document.addEventListener('DOMContentLoaded', () => {
     loadDashboard();
@@ -38,12 +64,11 @@ async function loadBalances() {
         
         const payments = await response.json();
         
-        if (!Array.isArray(payments)) {
-            throw new Error('Invalid payments data');
-        }
+        // Ensure payments is an array
+        const paymentsArray = Array.isArray(payments) ? payments : [];
         
-        const completedPayments = payments.filter(p => p.status === 'completed');
-        const pendingPayments = payments.filter(p => p.status === 'pending');
+        const completedPayments = paymentsArray.filter(p => p && p.status === 'completed');
+        const pendingPayments = paymentsArray.filter(p => p && p.status === 'pending');
         
         const availableBalance = completedPayments.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
         const pendingBalance = pendingPayments.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
@@ -73,6 +98,9 @@ async function loadAnalytics() {
         const response = await fetch('/api/payments');
         const payments = await response.json();
         
+        // Ensure payments is an array
+        const paymentsArray = Array.isArray(payments) ? payments : [];
+        
         const now = new Date();
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const yesterdayStart = new Date(todayStart);
@@ -83,7 +111,7 @@ async function loadAnalytics() {
         monthStart.setDate(monthStart.getDate() - 30);
         
         // Filter completed payments
-        const completed = payments.filter(p => p.status === 'completed');
+        const completed = paymentsArray.filter(p => p && p.status === 'completed');
         
         // Calculate revenues
         const todayRevenue = completed
@@ -132,12 +160,20 @@ async function loadRecentTransactions() {
         const response = await fetch('/api/payments');
         const payments = await response.json();
         
+        // Ensure payments is an array
+        const paymentsArray = Array.isArray(payments) ? payments : [];
+        
         // Sort by date and take last 15
-        const recentPayments = payments
+        const recentPayments = paymentsArray
             .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
             .slice(0, 15);
         
         const tbody = document.getElementById('recent-transactions');
+        
+        if (!tbody) {
+            console.error('Recent transactions tbody not found');
+            return;
+        }
         
         if (recentPayments.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" class="no-data">No transactions yet</td></tr>';
@@ -147,18 +183,18 @@ async function loadRecentTransactions() {
         tbody.innerHTML = recentPayments.map(payment => `
             <tr>
                 <td>${new Date(payment.created_at).toLocaleDateString()}</td>
-                <td><span class="transaction-id">${payment.link_id.substring(0, 12)}...</span></td>
+                <td><span class="transaction-id">${(payment.payment_link_id || '').substring(0, 12)}...</span></td>
                 <td>
                     <div class="customer-info">
                         <span class="customer-name">${payment.customer_name || 'N/A'}</span>
                         <span class="customer-email">${payment.customer_email || 'N/A'}</span>
                     </div>
                 </td>
-                <td class="amount-cell">$${payment.amount.toFixed(2)} ${payment.currency}</td>
+                <td class="amount-cell">$${(payment.amount || 0).toFixed(2)} ${payment.currency || 'USD'}</td>
                 <td>${getStatusBadge(payment.status)}</td>
                 <td>${getUSDTBadge(payment.usdt_conversion_status)}</td>
                 <td>
-                    <button class="action-btn" onclick="viewPayment('${payment.link_id}')">View</button>
+                    <button class="action-btn" onclick="viewPayment('${payment.payment_link_id}')">View</button>
                 </td>
             </tr>
         `).join('');
