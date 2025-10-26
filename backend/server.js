@@ -16,8 +16,14 @@ const authService = process.env.DB_TYPE === 'mysql'
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust proxy - important for sessions behind proxy
+app.set('trust proxy', 1);
+
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.BASE_URL || 'https://gateway.internationalitpro.com',
+  credentials: true
+}));
 
 // Session configuration
 app.use(session({
@@ -25,9 +31,10 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false, // Set to true only when using HTTPS
+    secure: false, // Set to false since proxy handles HTTPS
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    sameSite: 'lax'
   }
 }));
 
