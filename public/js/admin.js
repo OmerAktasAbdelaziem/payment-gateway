@@ -2,54 +2,12 @@
 let allPayments = [];
 let generatedPaymentUrl = '';
 
-// Check authentication on page load
-async function checkAuth() {
-    try {
-        const response = await fetch('/api/auth/check');
-        const data = await response.json();
-        
-        if (!data.authenticated) {
-            window.location.href = '/login';
-            return false;
-        }
-        
-        // Update username display
-        if (data.user && data.user.username) {
-            const usernameEl = document.getElementById('username');
-            if (usernameEl) {
-                usernameEl.textContent = data.user.username;
-            }
-        }
-        
-        return true;
-    } catch (error) {
-        console.error('Auth check error:', error);
-        window.location.href = '/login';
-        return false;
-    }
-}
+// No authentication required - removed checkAuth function
 
-// Handle logout
-async function handleLogout() {
-    if (!confirm('Are you sure you want to logout?')) {
-        return;
-    }
-    
-    try {
-        const response = await fetch('/api/auth/logout', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        if (response.ok) {
-            window.location.href = '/login';
-        }
-    } catch (error) {
-        console.error('Logout error:', error);
-        alert('Failed to logout. Please try again.');
-    }
+// Logout function removed - no authentication needed
+function handleLogout() {
+    // Logout removed - refresh page instead
+    window.location.reload();
 }
 
 // Sync Stripe transactions
@@ -80,12 +38,7 @@ async function syncStripeTransactions() {
 
 // Initialize dashboard
 document.addEventListener('DOMContentLoaded', async () => {
-    // Check authentication first
-    const isAuthenticated = await checkAuth();
-    if (!isAuthenticated) {
-        return;
-    }
-    
+    // No authentication check - dashboard is public
     loadDashboard();
     loadStats();
     loadPayments();

@@ -53,13 +53,11 @@ app.use(express.static(path.join(__dirname, '../public')));
 // Import routes
 const paymentRoutes = require('./routes/payment');
 const syncRoutes = require('./routes/sync');
-const authRoutes = require('./routes/auth');
-const { requireAuth, redirectIfAuthenticated } = require('./middleware/auth');
+// Auth routes removed - no login required
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api', requireAuth, paymentRoutes);
-app.use('/api', requireAuth, syncRoutes);
+// Routes - no authentication required
+app.use('/api', paymentRoutes);
+app.use('/api', syncRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -73,19 +71,11 @@ app.get('/api/health', (req, res) => {
 
 // Serve frontend pages
 app.get('/', (req, res) => {
-  // Redirect to admin if authenticated, otherwise to login
-  if (req.session && req.session.userId) {
-    res.redirect('/admin');
-  } else {
-    res.redirect('/login');
-  }
+  // Redirect directly to admin dashboard (no login required)
+  res.redirect('/admin');
 });
 
-app.get('/login', redirectIfAuthenticated, (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/login.html'));
-});
-
-app.get('/admin', requireAuth, (req, res) => {
+app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/admin.html'));
 });
 
