@@ -116,6 +116,7 @@ class Database {
 
   // Create a new payment
   async createPayment(paymentData) {
+    await this.ensureConnection();
     const [result] = await this.pool.execute(
       `INSERT INTO payments (
         payment_id, payment_link_id, amount, currency, 
