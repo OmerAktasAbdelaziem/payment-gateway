@@ -43,6 +43,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadStats();
     loadPayments();
     setupFormHandler();
+    
+    // Auto-refresh dashboard every 30 seconds
+    setInterval(() => {
+        const activeSection = document.querySelector('.section.active')?.id;
+        if (activeSection === 'dashboard-section') {
+            loadDashboard();
+        }
+        // Always refresh stats for the generator section
+        loadStats();
+    }, 30000); // 30 seconds
 });
 
 // Load dashboard data
@@ -71,10 +81,10 @@ async function loadBalances() {
             throw new Error('Failed to fetch payments');
         }
         
-        const payments = await response.json();
+        const data = await response.json();
         
-        // Ensure payments is an array
-        const paymentsArray = Array.isArray(payments) ? payments : [];
+        // Handle both array response and object with payments property
+        const paymentsArray = Array.isArray(data) ? data : (data.payments || []);
         
         const completedPayments = paymentsArray.filter(p => p && p.status === 'completed');
         const pendingPayments = paymentsArray.filter(p => p && p.status === 'pending');
@@ -125,10 +135,10 @@ async function loadBalances() {
 async function loadAnalytics() {
     try {
         const response = await fetch('/api/payments');
-        const payments = await response.json();
+        const data = await response.json();
         
-        // Ensure payments is an array
-        const paymentsArray = Array.isArray(payments) ? payments : [];
+        // Handle both array response and object with payments property
+        const paymentsArray = Array.isArray(data) ? data : (data.payments || []);
         
         const now = new Date();
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -187,10 +197,10 @@ async function loadAnalytics() {
 async function loadRecentTransactions() {
     try {
         const response = await fetch('/api/payments');
-        const payments = await response.json();
+        const data = await response.json();
         
-        // Ensure payments is an array
-        const paymentsArray = Array.isArray(payments) ? payments : [];
+        // Handle both array response and object with payments property
+        const paymentsArray = Array.isArray(data) ? data : (data.payments || []);
         
         // Sort by date and take last 15
         const recentPayments = paymentsArray
