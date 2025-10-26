@@ -1,10 +1,8 @@
-// IMMEDIATE TEST - This should execute right away
-alert('🔴 SCRIPT IS LOADING!');
+// Script loaded successfully
 console.log('🚀 Login.js loaded!');
 console.error('🔴 TESTING: If you see this, JavaScript is working!');
 
 document.addEventListener('DOMContentLoaded', () => {
-    alert('🟢 DOM LOADED!');
     console.log('✅ DOM Content Loaded');
     
     const loginForm = document.getElementById('login-form');
@@ -33,8 +31,16 @@ document.addEventListener('DOMContentLoaded', () => {
     loginForm.addEventListener('submit', async (e) => {
         console.log('📝 Form submit event triggered');
         e.preventDefault();
+        e.stopPropagation();
         console.log('🛑 Default form submission prevented');
-        await handleLogin();
+        
+        try {
+            await handleLogin();
+        } catch (error) {
+            console.error('💥 Error in form submit handler:', error);
+        }
+        
+        return false; // Extra safety to prevent form submission
     });
 
     async function checkAuthStatus() {
