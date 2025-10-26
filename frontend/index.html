@@ -4,6 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Gateway - Home</title>
+    <script>
+        // Redirect to login page if not authenticated
+        fetch('/api/health', { credentials: 'include' })
+            .then(() => {
+                // Check if user is logged in by trying to access admin endpoint
+                fetch('/api/payments', { credentials: 'include' })
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.href = '/admin';
+                        } else {
+                            window.location.href = '/login';
+                        }
+                    })
+                    .catch(() => {
+                        window.location.href = '/login';
+                    });
+            })
+            .catch(() => {
+                window.location.href = '/login';
+            });
+    </script>
     <style>
         * {
             margin: 0;
