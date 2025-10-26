@@ -44,7 +44,11 @@ router.post('/login', async (req, res) => {
 
             console.log('✅ Session saved successfully');
             console.log('🍪 Session ID after save:', req.sessionID);
+            console.log('🍪 Session cookie:', req.session.cookie);
             console.log('📤 Sending success response');
+            
+            // Ensure cookie is set in response
+            res.cookie('gateway.sid', req.sessionID, req.session.cookie);
             
             res.json({ 
                 success: true, 

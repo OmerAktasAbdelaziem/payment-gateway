@@ -35,8 +35,11 @@ app.use(session({
     secure: false, // Set to false since proxy handles HTTPS
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: 'lax'
-  }
+    sameSite: 'lax',
+    path: '/'
+  },
+  proxy: true, // Trust the proxy
+  name: 'gateway.sid' // Custom session name
 }));
 
 // IMPORTANT: Webhook route must be before bodyParser for raw body
