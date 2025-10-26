@@ -66,7 +66,12 @@ app.get('/api/health', (req, res) => {
 
 // Serve frontend pages
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/index.html'));
+  // Redirect to admin if authenticated, otherwise to login
+  if (req.session && req.session.userId) {
+    res.redirect('/admin');
+  } else {
+    res.redirect('/login');
+  }
 });
 
 app.get('/login', redirectIfAuthenticated, (req, res) => {
