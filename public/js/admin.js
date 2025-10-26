@@ -2,12 +2,40 @@
 let allPayments = [];
 let generatedPaymentUrl = '';
 
-// No authentication required - removed checkAuth function
+// Check authentication status
+async function checkAuth() {
+    try {
+        const response = await fetch('/api/auth/check');
+        const data = await response.json();
+        
+        if (!data.authenticated) {
+            window.location.href = '/login';
+        }
+        
+        return data.user;
+    } catch (error) {
+        console.error('Auth check failed:', error);
+        window.location.href = '/login';
+    }
+}
 
-// Logout function removed - no authentication needed
-function handleLogout() {
-    // Logout removed - refresh page instead
-    window.location.reload();
+// Logout function
+async function handleLogout() {
+    try {
+        const response = await fetch('/api/auth/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            window.location.href = '/login';
+        }
+    } catch (error) {
+        console.error('Logout error:', error);
+        window.location.href = '/login';
+    }
 }
 
 // Sync Stripe transactions
@@ -38,7 +66,10 @@ async function syncStripeTransactions() {
 
 // Initialize dashboard
 document.addEventListener('DOMContentLoaded', async () => {
-    // No authentication check - dashboard is public
+    // Check authentication first
+    await checkAuth();
+    
+    // Load dashboard data
     loadDashboard();
     loadStats();
     loadPayments();

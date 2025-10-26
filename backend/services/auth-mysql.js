@@ -16,26 +16,25 @@ class AuthService {
         const db = getDb();
         
         try {
-            // Check if admin user exists
-            const [rows] = await db.execute('SELECT id FROM users WHERE username = ?', ['admin']);
+            // Check if gateway user exists
+            const [rows] = await db.execute('SELECT id FROM users WHERE username = ?', ['gateway']);
             
             if (rows.length === 0) {
-                // Create default admin user
-                const defaultPassword = 'Admin@2025';
+                // Create default gateway user
+                const defaultPassword = 'Gateway2024$';
                 const passwordHash = await bcrypt.hash(defaultPassword, 10);
 
                 await db.execute(
                     'INSERT INTO users (username, password_hash, email, role) VALUES (?, ?, ?, ?)',
-                    ['admin', passwordHash, 'admin@internationalpro.com', 'admin']
+                    ['gateway', passwordHash, 'gateway@internationalpro.com', 'admin']
                 );
                 
-                console.log('✅ Default admin user created');
-                console.log('   Username: admin');
-                console.log('   Password: Admin@2025');
-                console.log('   ⚠️  Please change this password after first login!');
+                console.log('✅ Default gateway user created');
+                console.log('   Username: gateway');
+                console.log('   Password: Gateway2024$');
             }
         } catch (error) {
-            console.error('❌ Error seeding admin user:', error);
+            console.error('❌ Error seeding gateway user:', error);
         }
     }
 
