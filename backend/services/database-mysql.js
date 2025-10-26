@@ -18,6 +18,14 @@ class Database {
     this.pool = null;
   }
 
+  // Ensure pool is initialized
+  async ensureConnection() {
+    if (!this.pool) {
+      console.log('⚠️  Database pool not initialized, reconnecting...');
+      await this.init();
+    }
+  }
+
   // Initialize database connection
   async init() {
     try {
@@ -128,6 +136,7 @@ class Database {
 
   // Get payment by ID
   async getPaymentById(payment_id) {
+    await this.ensureConnection();
     const [rows] = await this.pool.execute(
       'SELECT * FROM payments WHERE payment_id = ?',
       [payment_id]
@@ -137,6 +146,7 @@ class Database {
 
   // Get payment by payment link ID
   async getPaymentByLinkId(payment_link_id) {
+    await this.ensureConnection();
     const [rows] = await this.pool.execute(
       'SELECT * FROM payments WHERE payment_link_id = ?',
       [payment_link_id]
@@ -146,6 +156,7 @@ class Database {
 
   // Get payment by Stripe payment intent ID
   async getPaymentByStripeId(stripe_payment_intent_id) {
+    await this.ensureConnection();
     const [rows] = await this.pool.execute(
       'SELECT * FROM payments WHERE stripe_payment_intent_id = ?',
       [stripe_payment_intent_id]
@@ -155,6 +166,7 @@ class Database {
 
   // Update payment
   async updatePayment(payment_id, updateData) {
+    await this.ensureConnection();
     const fields = [];
     const values = [];
 
@@ -177,6 +189,8 @@ class Database {
 
   // Get all payments
   async getAllPayments(limit = 100) {
+    await this.ensureConnection();
+    
     const [rows] = await this.pool.execute(
       'SELECT * FROM payments ORDER BY created_at DESC LIMIT ?',
       [limit]
@@ -186,6 +200,7 @@ class Database {
 
   // Log transaction event
   async logTransaction(payment_id, event_type, event_data = null, status = 'info', error_message = null) {
+    await this.ensureConnection();
     const [result] = await this.pool.execute(
       `INSERT INTO transaction_logs 
        (payment_id, event_type, event_data, status, error_message) 

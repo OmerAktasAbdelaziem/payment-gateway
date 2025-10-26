@@ -307,7 +307,7 @@ router.get('/wallet-balance', async (req, res) => {
     const binanceBalance = await binanceService.getBalance('USDT');
     
     // Calculate total USDT received from completed payments
-    const payments = await database.getPayments();
+    const payments = await database.getAllPayments();
     const completedPayments = payments.filter(p => p.status === 'completed');
     const totalUSDTReceived = completedPayments.reduce((sum, p) => {
       return sum + (parseFloat(p.usdt_amount) || 0);
