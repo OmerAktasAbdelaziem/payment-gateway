@@ -1,6 +1,10 @@
+// IMMEDIATE TEST - This should execute right away
+alert('🔴 SCRIPT IS LOADING!');
 console.log('🚀 Login.js loaded!');
+console.error('🔴 TESTING: If you see this, JavaScript is working!');
 
 document.addEventListener('DOMContentLoaded', () => {
+    alert('🟢 DOM LOADED!');
     console.log('✅ DOM Content Loaded');
     
     const loginForm = document.getElementById('login-form');
