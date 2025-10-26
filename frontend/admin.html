@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Payment Gateway</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="/INTERNATIONAL%20PRO%20black.png" alt="International Pro Ltd" style="max-height: 100px; max-width: 240px; object-fit: contain; filter: brightness(0) invert(1);">
+            </div>
+            <nav class="nav">
+                <a href="#dashboard" class="nav-item active" onclick="showSection('dashboard')">
+                    <span class="icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#generator" class="nav-item" onclick="showSection('generator')">
+                    <span class="icon">🔗</span>
+                    <span>Generate Link</span>
+                </a>
+                <a href="#payments" class="nav-item" onclick="showSection('payments')">
+                    <span class="icon">💳</span>
+                    <span>Payments</span>
+                </a>
+                <a href="#settings" class="nav-item" onclick="showSection('settings')">
+                    <span class="icon">⚙️</span>
+                    <span>Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <h1 id="page-title">Dashboard</h1>
+                <div class="header-actions">
+                    <button class="btn-icon" onclick="refreshData()" title="Refresh">
+                        🔄
+                    </button>
+                    <div class="user-menu">
+                        <span class="user-name">Admin</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="section active">
+                <!-- Balance Cards -->
+                <div class="balance-grid">
+                    <div class="balance-card stripe-card">
+                        <div class="balance-header">
+                            <div class="balance-icon">💳</div>
+                            <h3>Stripe Balance</h3>
+                        </div>
+                        <div class="balance-amount" id="stripe-balance">
+                            <span class="amount-loading">Loading...</span>
+                        </div>
+                        <div class="balance-footer">
+                            <span class="balance-label">Available</span>
+                            <span class="balance-pending" id="stripe-pending">Pending: $0.00</span>
+                        </div>
+                    </div>
+                    <div class="balance-card wallet-card">
+                        <div class="balance-header">
+                            <div class="balance-icon">🪙</div>
+                            <h3>USDT Wallet</h3>
+                        </div>
+                        <div class="balance-amount" id="wallet-balance">
+                            <span class="amount-loading">Simulation Mode</span>
+                        </div>
+                        <div class="balance-footer">
+                            <span class="balance-label">Total USDT</span>
+                            <span class="balance-network" id="wallet-network">Network: TRC20</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Grid -->
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <div class="analytics-header">
+                            <h3>📈 Today's Revenue</h3>
+                            <span class="analytics-change positive" id="today-change">+0%</span>
+                        </div>
+                        <div class="analytics-value" id="today-revenue">$0.00</div>
+                        <div class="analytics-footer">Compared to yesterday</div>
+                    </div>
+                    <div class="analytics-card">
+                        <div class="analytics-header">
+                            <h3>📅 This Week</h3>
+                            <span class="analytics-change" id="week-change">+0%</span>
+                        </div>
+                        <div class="analytics-value" id="week-revenue">$0.00</div>
+                        <div class="analytics-footer">7 days</div>
+                    </div>
+                    <div class="analytics-card">
+                        <div class="analytics-header">
+                            <h3>📆 This Month</h3>
+                            <span class="analytics-change" id="month-change">+0%</span>
+                        </div>
+                        <div class="analytics-value" id="month-revenue">$0.00</div>
+                        <div class="analytics-footer">30 days</div>
+                    </div>
+                    <div class="analytics-card">
+                        <div class="analytics-header">
+                            <h3>💰 Total Revenue</h3>
+                            <span class="analytics-badge">All time</span>
+                        </div>
+                        <div class="analytics-value" id="total-revenue-dashboard">$0.00</div>
+                        <div class="analytics-footer">Lifetime earnings</div>
+                    </div>
+                </div>
+
+                <!-- Recent Transactions -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Recent Transactions (Last 15)</h2>
+                        <button class="btn-secondary" onclick="showSection('payments')">View All</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="dashboard-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Transaction ID</th>
+                                        <th>Customer</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>USDT</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-transactions">
+                                    <tr>
+                                        <td colspan="7" class="no-data">No transactions yet</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Generator Section -->
+            <section id="generator-section" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Create New Payment Link</h2>
+                        <p>Generate a secure payment link to share with your customer</p>
+                    </div>
+                    <div class="card-body">
+                        <form id="generate-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="amount">Amount (USD)</label>
+                                    <input 
+                                        type="number" 
+                                        id="amount" 
+                                        placeholder="100.00" 
+                                        step="0.01"
+                                        min="1"
+                                        required
+                                    >
+                                </div>
+                                <div class="form-group">
+                                    <label for="currency">Currency</label>
+                                    <select id="currency">
+                                        <option value="USD">USD</option>
+                                        <option value="EUR">EUR</option>
+                                        <option value="GBP">GBP</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="customer-email">Customer Email (Optional)</label>
+                                    <input 
+                                        type="email" 
+                                        id="customer-email" 
+                                        placeholder="customer@example.com"
+                                    >
+                                </div>
+                                <div class="form-group">
+                                    <label for="customer-name">Customer Name (Optional)</label>
+                                    <input 
+                                        type="text" 
+                                        id="customer-name" 
+                                        placeholder="John Doe"
+                                    >
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                <span class="btn-text">Generate Payment Link</span>
+                                <span class="btn-loader" style="display: none;">⏳</span>
+                            </button>
+                        </form>
+
+                        <!-- Generated Link Display -->
+                        <div id="generated-link" class="generated-link" style="display: none;">
+                            <div class="success-banner">
+                                <span class="success-icon">✓</span>
+                                <span>Payment link generated successfully!</span>
+                            </div>
+                            <div class="link-box">
+                                <input 
+                                    type="text" 
+                                    id="payment-url" 
+                                    readonly 
+                                    onclick="this.select()"
+                                >
+                                <button class="btn-copy" onclick="copyLink()">
+                                    📋 Copy
+                                </button>
+                            </div>
+                            <div class="link-actions">
+                                <button class="btn btn-secondary" onclick="openLink()">
+                                    Open Link
+                                </button>
+                                <button class="btn btn-secondary" onclick="shareLink()">
+                                    Share via Email
+                                </button>
+                                <button class="btn btn-secondary" onclick="resetForm()">
+                                    Create Another
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-content">
+                            <div class="stat-label">Total Revenue</div>
+                            <div class="stat-value" id="total-revenue">$0.00</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-content">
+                            <div class="stat-label">Successful Payments</div>
+                            <div class="stat-value" id="successful-count">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-content">
+                            <div class="stat-label">Pending Payments</div>
+                            <div class="stat-value" id="pending-count">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">❌</div>
+                        <div class="stat-content">
+                            <div class="stat-label">Failed Payments</div>
+                            <div class="stat-value" id="failed-count">0</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Payments Section -->
+            <section id="payments-section" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Recent Payments</h2>
+                        <div class="filter-group">
+                            <select id="status-filter" onchange="filterPayments()">
+                                <option value="">All Status</option>
+                                <option value="completed">Completed</option>
+                                <option value="pending">Pending</option>
+                                <option value="failed">Failed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="payments-table">
+                                <thead>
+                                    <tr>
+                                        <th>Payment ID</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>USDT Amount</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="payments-tbody">
+                                    <tr>
+                                        <td colspan="6" class="loading-row">
+                                            <div class="loader"></div>
+                                            <span>Loading payments...</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings-section" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Configuration</h2>
+                        <p>Current API configuration status</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="settings-grid">
+                            <div class="setting-item">
+                                <div class="setting-icon">🔑</div>
+                                <div class="setting-content">
+                                    <h3>Stripe API</h3>
+                                    <p>Configure your Stripe API keys in .env file</p>
+                                    <span class="status-badge pending">Configuration Required</span>
+                                </div>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-icon">💱</div>
+                                <div class="setting-content">
+                                    <h3>Exchange API</h3>
+                                    <p>Set up Binance or other exchange API</p>
+                                    <span class="status-badge pending">Configuration Required</span>
+                                </div>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-icon">💳</div>
+                                <div class="setting-content">
+                                    <h3>USDT Wallet</h3>
+                                    <p>Your USDT receiving wallet address</p>
+                                    <span class="status-badge pending">Configuration Required</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="info-box">
+                            <h3>📝 Setup Instructions</h3>
+                            <ol>
+                                <li>Get your Stripe API keys from <a href="https://dashboard.stripe.com/apikeys" target="_blank">Stripe Dashboard</a></li>
+                                <li>Create API keys on your exchange (Binance, Kraken, etc.)</li>
+                                <li>Add your USDT wallet address</li>
+                                <li>Update all values in the <code>.env</code> file</li>
+                                <li>Restart the server</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/js/admin.js"></script>
+</body>
+</html>

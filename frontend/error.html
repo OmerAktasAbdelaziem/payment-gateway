@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Failed</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 50px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .error-icon {
+            width: 80px;
+            height: 80px;
+            background: #fee2e2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            animation: shake 0.5s ease;
+        }
+
+        .error-icon svg {
+            width: 50px;
+            height: 50px;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        h1 {
+            color: #1e293b;
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 18px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .error-details {
+            background: #fef2f2;
+            border: 2px solid #fca5a5;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .error-details h3 {
+            color: #991b1b;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .error-details p {
+            color: #7f1d1d;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .common-issues {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .common-issues h3 {
+            color: #1e293b;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .issue {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 12px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .issue:last-child {
+            margin-bottom: 0;
+        }
+
+        .issue-icon {
+            color: #ef4444;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .support-info {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .support-info p {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .support-info a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .support-info a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+
+            .subtitle {
+                font-size: 16px;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="error-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
+        </div>
+
+        <h1>Payment Failed</h1>
+        <p class="subtitle">We were unable to process your payment. Please try again.</p>
+
+        <div class="error-details">
+            <h3>Error Details</h3>
+            <p id="error-message">
+                Your payment could not be completed. This may be due to insufficient funds, 
+                an incorrect card number, or your card being declined by your bank.
+            </p>
+        </div>
+
+        <div class="common-issues">
+            <h3>Common Issues:</h3>
+            <div class="issue">
+                <span class="issue-icon">⚠️</span>
+                <span>Check that your card details are entered correctly</span>
+            </div>
+            <div class="issue">
+                <span class="issue-icon">💳</span>
+                <span>Ensure you have sufficient funds in your account</span>
+            </div>
+            <div class="issue">
+                <span class="issue-icon">🌍</span>
+                <span>Verify that your card supports international transactions</span>
+            </div>
+            <div class="issue">
+                <span class="issue-icon">🔒</span>
+                <span>Contact your bank if your card was declined</span>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-primary" onclick="history.back()">
+                Try Again
+            </button>
+            <a href="/" class="btn btn-secondary">
+                Return to Home
+            </a>
+        </div>
+
+        <div class="support-info">
+            <p>Need help? Contact our support team:</p>
+            <a href="mailto:support@example.com">support@example.com</a>
+        </div>
+    </div>
+
+    <script>
+        // Get error message from URL if provided
+        const urlParams = new URLSearchParams(window.location.search);
+        const errorMsg = urlParams.get('error');
+
+        if (errorMsg) {
+            document.getElementById('error-message').textContent = decodeURIComponent(errorMsg);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - Secure Checkout</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <link rel="stylesheet" href="/css/payment.css">
+</head>
+<body>
+    <div class="payment-container">
+        <div class="payment-card">
+            <!-- Header -->
+            <div class="payment-header">
+                <div class="logo">
+                    <img src="/INTERNATIONAL%20PRO%20black.png" alt="International Pro Ltd" class="company-logo">
+                </div>
+                <h1>Secure Payment</h1>
+                <p class="subtitle">Complete your payment securely</p>
+            </div>
+
+            <!-- Payment Info -->
+            <div class="payment-info">
+                <div class="info-row">
+                    <span class="label">Amount to Pay:</span>
+                    <span class="amount" id="payment-amount">Loading...</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Payment ID:</span>
+                    <span class="payment-id" id="payment-id">-</span>
+                </div>
+            </div>
+
+            <!-- Payment Form -->
+            <form id="payment-form">
+                <div class="form-section">
+                    <label for="email">Email Address</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        placeholder="your@email.com" 
+                        required
+                        autocomplete="email"
+                    >
+                </div>
+
+                <div class="form-section">
+                    <label for="card-element">Card Information</label>
+                    <div id="card-element" class="card-element">
+                        <!-- Stripe Card Element will be inserted here -->
+                    </div>
+                    <div id="card-errors" class="card-errors"></div>
+                </div>
+
+                <div class="security-badges">
+                    <div class="badge">
+                        <svg width="20" height="20" fill="#10b981" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 1l7 3v5c0 5-3 9-7 11-4-2-7-6-7-11V4l7-3z"/>
+                        </svg>
+                        <span>Secure Payment</span>
+                    </div>
+                    <div class="badge">
+                        <svg width="20" height="20" fill="#10b981" viewBox="0 0 20 20">
+                            <path d="M10 2a6 6 0 100 12 6 6 0 000-12zM9 9V6h2v3h3v2h-3v3H9v-3H6V9h3z"/>
+                        </svg>
+                        <span>Encrypted</span>
+                    </div>
+                    <div class="badge">
+                        <span>🔒 SSL Secured</span>
+                    </div>
+                </div>
+
+                <button type="submit" id="submit-button" class="submit-button">
+                    <span class="button-text">Pay Now</span>
+                    <span class="button-loader" style="display: none;">
+                        <svg class="spinner" viewBox="0 0 50 50">
+                            <circle cx="25" cy="25" r="20" fill="none" stroke="white" stroke-width="4"></circle>
+                        </svg>
+                    </span>
+                </button>
+
+                <div class="form-footer">
+                    <p>Powered by INTERNATIONAL PRO</p>
+                </div>
+            </form>
+
+            <!-- Loading State -->
+            <div id="loading-state" class="loading-state">
+                <div class="loader"></div>
+                <p>Loading payment details...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="error-state" class="error-state" style="display: none;">
+                <div class="error-icon">⚠️</div>
+                <h2>Payment Link Invalid</h2>
+                <p id="error-message">This payment link is invalid or has expired.</p>
+                <a href="/" class="back-button">Go to Home</a>
+            </div>
+        </div>
+
+        <!-- Payment Status Messages -->
+        <div id="status-message" class="status-message" style="display: none;"></div>
+    </div>
+
+    <script src="/js/payment.js"></script>
+</body>
+</html>
