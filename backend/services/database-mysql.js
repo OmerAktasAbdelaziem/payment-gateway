@@ -203,14 +203,18 @@ class Database {
 
   // Get all payments
   async getAllPayments(limit = 100) {
-    console.log('📊 getAllPayments called with limit:', limit);
+    console.log('📊 getAllPayments called with limit:', limit, 'type:', typeof limit);
     await this.ensureConnection();
     console.log('📊 After ensureConnection - pool status:', this.pool ? 'EXISTS' : 'NULL');
+    
+    // Ensure limit is a number
+    const limitNum = parseInt(limit) || 100;
+    console.log('📊 Parsed limit:', limitNum);
     
     try {
       const [rows] = await this.pool.execute(
         'SELECT * FROM payments ORDER BY created_at DESC LIMIT ?',
-        [limit]
+        [limitNum]
       );
       console.log('✅ getAllPayments executed successfully - rows:', rows.length);
       return rows;
@@ -245,6 +249,11 @@ class Database {
       [payment_id]
     );
     return rows;
+  }
+
+  // Alias for logTransaction (for compatibility)
+  async logEvent(payment_id, event_type, event_data = null) {
+    return this.logTransaction(payment_id, event_type, event_data, 'info', null);
   }
 
   // Get database instance (for auth service)
