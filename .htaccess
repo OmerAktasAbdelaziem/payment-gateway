@@ -1,0 +1,16 @@
+# Route all requests through index.php (PHP Proxy)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    
+    # If the request is for index.php itself, serve it
+    RewriteRule ^index\.php$ - [L]
+    
+    # If the file or directory exists, serve it directly
+    # This allows static files (CSS, JS, images) to be served
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # Route everything else through index.php
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
