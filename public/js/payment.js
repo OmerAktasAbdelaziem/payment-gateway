@@ -17,8 +17,8 @@ const cardErrors = document.getElementById('card-errors');
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        // Load Stripe publishable key (LIVE MODE)
-        const stripeKey = 'pk_live_51SLloUHqjjklN91QyaOQqGaVfcr0VZBRc5JDY8KhpU2BYEZn7FHhGHjojcN9BfWLCMNigRFrXQcOSJwHgRvhBEMI00YjU7fzAl';
+        // Load Stripe publishable key (TEST MODE)
+        const stripeKey = 'pk_test_51SLloUHqjjklN91QbGkChAabLxsYKUiZXCIALy5sYpK1Q6kwCjw55IVFDcTW8oRyOo3AELO3tVbLjq5LYK2bTrxF00WjjK3011';
         stripe = Stripe(stripeKey);
 
         // Load payment details
