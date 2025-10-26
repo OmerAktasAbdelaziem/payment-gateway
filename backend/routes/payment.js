@@ -298,4 +298,41 @@ router.get('/payment/:payment_id/conversion', async (req, res) => {
   }
 });
 
+// Get wallet balances (Binance USDT balance and total USDT received)
+router.get('/wallet-balance', async (req, res) => {
+  try {
+    const binanceService = require('../services/binance');
+    
+    // Get Binance USDT balance
+    const binanceBalance = await binanceService.getBalance('USDT');
+    
+    // Calculate total USDT received from completed payments
+    const payments = await database.getPayments();
+    const completedPayments = payments.filter(p => p.status === 'completed');
+    const totalUSDTReceived = completedPayments.reduce((sum, p) => {
+      return sum + (parseFloat(p.usdt_amount) || 0);
+    }, 0);
+
+    res.json({
+      success: true,
+      binance: {
+        available: binanceBalance.balance || 0,
+        locked: binanceBalance.locked || 0,
+        total: binanceBalance.total || 0,
+        configured: binanceBalance.success
+      },
+      totalReceived: totalUSDTReceived,
+      network: 'TRC20'
+    });
+
+  } catch (error) {
+    console.error('❌ Get Wallet Balance Error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to retrieve wallet balance',
+      message: error.message
+    });
+  }
+});
+
 module.exports = router;

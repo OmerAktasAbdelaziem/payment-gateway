@@ -95,9 +95,29 @@ async function loadBalances() {
     const walletNetworkEl = document.getElementById('wallet-network');
     
     if (walletBalanceEl && walletNetworkEl) {
-        // Check if Binance is configured
-        walletBalanceEl.innerHTML = `<span class="amount-loading">Simulation Mode</span>`;
-        walletNetworkEl.textContent = `Network: TRC20`;
+        try {
+            // Fetch wallet balance from API
+            const walletResponse = await fetch('/api/wallet-balance');
+            const walletData = await walletResponse.json();
+            
+            if (walletData.success) {
+                const totalUSDT = walletData.totalReceived || 0;
+                walletBalanceEl.innerHTML = `${totalUSDT.toFixed(2)} <span style="font-size: 0.6em; opacity: 0.8;">USDT</span>`;
+                walletNetworkEl.textContent = `Network: ${walletData.network}`;
+                
+                // Add Binance balance info if configured
+                if (walletData.binance.configured) {
+                    walletNetworkEl.textContent += ` | Binance: ${walletData.binance.total.toFixed(2)} USDT`;
+                }
+            } else {
+                walletBalanceEl.innerHTML = `0.00 <span style="font-size: 0.6em; opacity: 0.8;">USDT</span>`;
+                walletNetworkEl.textContent = `Network: TRC20`;
+            }
+        } catch (error) {
+            console.error('Error loading wallet balance:', error);
+            walletBalanceEl.innerHTML = `0.00 <span style="font-size: 0.6em; opacity: 0.8;">USDT</span>`;
+            walletNetworkEl.textContent = `Network: TRC20`;
+        }
     }
 }
 
