@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const authService = require('../services/auth');
+// Use MySQL auth service if DB_TYPE is set to mysql, otherwise use SQLite
+const authService = process.env.DB_TYPE === 'mysql' 
+  ? require('../services/auth-mysql')
+  : require('../services/auth');
 
 // Login endpoint
 router.post('/login', async (req, res) => {
