@@ -285,8 +285,14 @@ class Database {
       }
     });
   }
+
+  // Get database instance
+  getDb() {
+    return this.db;
+  }
 }
 
 // Export singleton instance
 const database = new Database();
 module.exports = database;
+module.exports.getDb = () => database.db;

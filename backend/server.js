@@ -2,8 +2,10 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const session = require('express-session');
 const path = require('path');
 const database = require('./services/database');
+const authService = require('./services/auth');
 
 // Initialize Express app
 const app = express();
@@ -11,6 +13,18 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
+
+// Session configuration
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'international-pro-payment-gateway-secret-2025',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: false, // Set to true only when using HTTPS
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
 
 // IMPORTANT: Webhook route must be before bodyParser for raw body
 const webhookRoutes = require('./routes/webhook');
@@ -27,10 +41,13 @@ app.use(express.static(path.join(__dirname, '../public')));
 // Import routes
 const paymentRoutes = require('./routes/payment');
 const syncRoutes = require('./routes/sync');
+const authRoutes = require('./routes/auth');
+const { requireAuth, redirectIfAuthenticated } = require('./middleware/auth');
 
 // Routes
-app.use('/api', paymentRoutes);
-app.use('/api', syncRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api', requireAuth, paymentRoutes);
+app.use('/api', requireAuth, syncRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -47,7 +64,11 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
-app.get('/admin', (req, res) => {
+app.get('/login', redirectIfAuthenticated, (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/login.html'));
+});
+
+app.get('/admin', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/admin.html'));
 });
 
@@ -85,6 +106,9 @@ async function startServer() {
   try {
     // Initialize database
     await database.init();
+    
+    // Initialize auth service
+    await authService.initialize();
     
     // Start server
     app.listen(PORT, () => {

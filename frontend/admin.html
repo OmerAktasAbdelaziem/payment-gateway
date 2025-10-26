@@ -26,10 +26,6 @@
                     <span class="icon">💳</span>
                     <span>Payments</span>
                 </a>
-                <a href="#settings" class="nav-item" onclick="showSection('settings')">
-                    <span class="icon">⚙️</span>
-                    <span>Settings</span>
-                </a>
             </nav>
         </aside>
 
@@ -45,7 +41,8 @@
                         🔄
                     </button>
                     <div class="user-menu">
-                        <span class="user-name">Admin</span>
+                        <span class="user-name" id="username">Admin</span>
+                        <button class="btn-logout" onclick="handleLogout()">Logout</button>
                     </div>
                 </div>
             </header>
@@ -311,53 +308,6 @@
                 </div>
             </section>
 
-            <!-- Settings Section -->
-            <section id="settings-section" class="section">
-                <div class="card">
-                    <div class="card-header">
-                        <h2>Configuration</h2>
-                        <p>Current API configuration status</p>
-                    </div>
-                    <div class="card-body">
-                        <div class="settings-grid">
-                            <div class="setting-item">
-                                <div class="setting-icon">🔑</div>
-                                <div class="setting-content">
-                                    <h3>Stripe API</h3>
-                                    <p>Configure your Stripe API keys in .env file</p>
-                                    <span class="status-badge pending">Configuration Required</span>
-                                </div>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-icon">💱</div>
-                                <div class="setting-content">
-                                    <h3>Exchange API</h3>
-                                    <p>Set up Binance or other exchange API</p>
-                                    <span class="status-badge pending">Configuration Required</span>
-                                </div>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-icon">💳</div>
-                                <div class="setting-content">
-                                    <h3>USDT Wallet</h3>
-                                    <p>Your USDT receiving wallet address</p>
-                                    <span class="status-badge pending">Configuration Required</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="info-box">
-                            <h3>📝 Setup Instructions</h3>
-                            <ol>
-                                <li>Get your Stripe API keys from <a href="https://dashboard.stripe.com/apikeys" target="_blank">Stripe Dashboard</a></li>
-                                <li>Create API keys on your exchange (Binance, Kraken, etc.)</li>
-                                <li>Add your USDT wallet address</li>
-                                <li>Update all values in the <code>.env</code> file</li>
-                                <li>Restart the server</li>
-                            </ol>
-                        </div>
-                    </div>
-                </div>
             </section>
         </main>
     </div>
