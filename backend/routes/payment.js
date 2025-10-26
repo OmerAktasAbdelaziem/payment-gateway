@@ -194,6 +194,8 @@ router.post('/create-payment-intent', async (req, res) => {
 
 // Get all payments (for admin dashboard)
 router.get('/payments', async (req, res) => {
+  console.log('🔵 GET /api/payments called');
+  console.log('🔵 Query params:', req.query);
   try {
     const { status, limit } = req.query;
 
@@ -201,20 +203,25 @@ router.get('/payments', async (req, res) => {
     if (status) filters.status = status;
     if (limit) filters.limit = parseInt(limit);
 
-    const payments = await database.getAllPayments(filters);
+    console.log('🔵 Calling database.getAllPayments with filters:', filters);
+    const payments = await database.getAllPayments(filters.limit || 100);
+    console.log('🔵 Received payments:', payments ? payments.length : 'NULL');
 
     res.json({
       success: true,
       count: payments.length,
       payments
     });
+    console.log('✅ GET /api/payments completed successfully');
 
   } catch (error) {
     console.error('❌ Get Payments Error:', error);
+    console.error('❌ Error stack:', error.stack);
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve payments',
-      message: error.message
+      message: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 });

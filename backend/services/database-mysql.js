@@ -16,23 +16,36 @@ const dbConfig = {
 class Database {
   constructor() {
     this.pool = null;
+    console.log('🔧 Database constructor called - pool is NULL');
   }
 
   // Ensure pool is initialized
   async ensureConnection() {
+    console.log('🔍 ensureConnection called - pool status:', this.pool ? 'EXISTS' : 'NULL');
     if (!this.pool) {
       console.log('⚠️  Database pool not initialized, reconnecting...');
       await this.init();
+    } else {
+      console.log('✅ Pool already exists, skipping init');
     }
   }
 
   // Initialize database connection
   async init() {
+    console.log('🚀 Database init() called');
+    console.log('📋 DB Config:', {
+      host: dbConfig.host,
+      port: dbConfig.port,
+      database: dbConfig.database,
+      user: dbConfig.user
+    });
     try {
       this.pool = mysql.createPool(dbConfig);
+      console.log('✅ Pool created successfully');
       
       // Test connection
       const connection = await this.pool.getConnection();
+      console.log('✅ Test connection acquired');
       console.log('✅ Connected to MySQL database');
       connection.release();
       
@@ -190,13 +203,21 @@ class Database {
 
   // Get all payments
   async getAllPayments(limit = 100) {
+    console.log('📊 getAllPayments called with limit:', limit);
     await this.ensureConnection();
+    console.log('📊 After ensureConnection - pool status:', this.pool ? 'EXISTS' : 'NULL');
     
-    const [rows] = await this.pool.execute(
-      'SELECT * FROM payments ORDER BY created_at DESC LIMIT ?',
-      [limit]
-    );
-    return rows;
+    try {
+      const [rows] = await this.pool.execute(
+        'SELECT * FROM payments ORDER BY created_at DESC LIMIT ?',
+        [limit]
+      );
+      console.log('✅ getAllPayments executed successfully - rows:', rows.length);
+      return rows;
+    } catch (error) {
+      console.error('❌ getAllPayments error:', error.message);
+      throw error;
+    }
   }
 
   // Log transaction event

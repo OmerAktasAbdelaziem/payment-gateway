@@ -4,9 +4,14 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require('path');
+
 // Always use MySQL database
+console.log('🔧 Loading database-mysql module...');
 const database = require('./services/database-mysql');
+console.log('✅ database-mysql module loaded');
+console.log('🔧 Loading auth-mysql module...');
 const authService = require('./services/auth-mysql');
+console.log('✅ auth-mysql module loaded');
 
 // Initialize Express app
 const app = express();
