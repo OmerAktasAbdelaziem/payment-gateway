@@ -44,8 +44,9 @@ body {
 }
 
 .login-logo {
-    height: 80px;
+    height: 150px;
     width: auto;
+    max-width: 100%;
 }
 
 h1 {
