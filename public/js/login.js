@@ -32,7 +32,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const username = usernameInput.value.trim();
         const password = passwordInput.value;
 
+        console.log('🔐 Frontend: Starting login...', { username });
+
         if (!username || !password) {
+            console.log('❌ Frontend: Missing credentials');
             showError('Please enter both username and password');
             return;
         }
@@ -42,31 +45,43 @@ document.addEventListener('DOMContentLoaded', () => {
         hideError();
 
         try {
+            console.log('📤 Frontend: Sending login request...');
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
+                credentials: 'include', // Important for cookies
                 body: JSON.stringify({ username, password })
             });
 
+            console.log('📥 Frontend: Response received', {
+                status: response.status,
+                ok: response.ok,
+                headers: Object.fromEntries(response.headers.entries())
+            });
+
             const data = await response.json();
+            console.log('📥 Frontend: Response data:', data);
 
             if (response.ok && data.success) {
                 // Login successful
+                console.log('✅ Frontend: Login successful! Redirecting...');
                 showSuccess();
                 setTimeout(() => {
+                    console.log('🔀 Frontend: Redirecting to /admin');
                     window.location.href = '/admin';
                 }, 500);
             } else {
                 // Login failed
+                console.log('❌ Frontend: Login failed', data.error);
                 showError(data.error || 'Invalid username or password');
                 setLoading(false);
                 passwordInput.value = '';
                 passwordInput.focus();
             }
         } catch (error) {
-            console.error('Login error:', error);
+            console.error('💥 Frontend: Login exception:', error);
             showError('Connection error. Please try again.');
             setLoading(false);
         }
