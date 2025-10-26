@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Stripe = require('stripe');
 const { v4: uuidv4 } = require('uuid');
-const database = require('../services/database');
+const database = require('../services/database-mysql');
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 

@@ -4,13 +4,9 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require('path');
-// Use MySQL if DB_TYPE is set to mysql, otherwise use SQLite
-const database = process.env.DB_TYPE === 'mysql' 
-  ? require('./services/database-mysql') 
-  : require('./services/database');
-const authService = process.env.DB_TYPE === 'mysql'
-  ? require('./services/auth-mysql')
-  : require('./services/auth');
+// Always use MySQL database
+const database = require('./services/database-mysql');
+const authService = require('./services/auth-mysql');
 
 // Initialize Express app
 const app = express();

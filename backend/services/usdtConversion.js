@@ -1,5 +1,5 @@
 const binanceService = require('./binance');
-const database = require('./database');
+const database = require('./database-mysql');
 
 class USDTConversionService {
   

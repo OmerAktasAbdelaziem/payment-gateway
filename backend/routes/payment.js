@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
-const database = require('../services/database');
+const database = require('../services/database-mysql');
 const stripeService = require('../services/stripe');
 const usdtConversionService = require('../services/usdtConversion');
 
