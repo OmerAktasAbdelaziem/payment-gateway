@@ -11,9 +11,9 @@ $url = $nodeUrl . $requestUri;
 // Initialize cURL
 $ch = curl_init($url);
 
-// Configure cURL
+// Configure cURL to capture headers
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HEADER, false);
+curl_setopt($ch, CURLOPT_HEADER, true);  // Include headers in output
 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 
@@ -29,19 +29,24 @@ if (in_array($method, ['POST', 'PUT', 'PATCH', 'DELETE'])) {
     }
 }
 
-// Forward headers (excluding Host)
+// Forward headers (including cookies)
 $headers = [];
 foreach (getallheaders() as $key => $value) {
     if (strtolower($key) !== 'host') {
         $headers[] = "$key: $value";
     }
 }
+
+// Add X-Forwarded headers for proxy
+$headers[] = 'X-Forwarded-For: ' . $_SERVER['REMOTE_ADDR'];
+$headers[] = 'X-Forwarded-Proto: https';
+$headers[] = 'X-Forwarded-Host: ' . $_SERVER['HTTP_HOST'];
+
 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
 // Execute the request
 $response = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-$contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
 
 // Check for cURL errors
 if (curl_errno($ch)) {
@@ -52,12 +57,25 @@ if (curl_errno($ch)) {
     exit;
 }
 
+// Split headers and body
+$header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+$header_text = substr($response, 0, $header_size);
+$body = substr($response, $header_size);
+
 curl_close($ch);
 
-// Forward the response
-http_response_code($httpCode);
-if ($contentType) {
-    header('Content-Type: ' . $contentType);
+// Parse and forward response headers
+$headers = explode("\r\n", $header_text);
+foreach ($headers as $header) {
+    $header = trim($header);
+    if (!empty($header) && strpos($header, 'HTTP/') !== 0 && strpos($header, 'Transfer-Encoding') === false) {
+        header($header, false);
+    }
 }
-echo $response;
+
+// Set HTTP response code
+http_response_code($httpCode);
+
+// Output the body
+echo $body;
 ?>
