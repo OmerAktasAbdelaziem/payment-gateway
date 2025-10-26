@@ -1,4 +1,8 @@
+console.log('🚀 Login.js loaded!');
+
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('✅ DOM Content Loaded');
+    
     const loginForm = document.getElementById('login-form');
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
@@ -7,24 +11,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const buttonSpinner = document.getElementById('button-spinner');
     const errorMessage = document.getElementById('error-message');
 
+    console.log('📋 Form elements:', {
+        loginForm: !!loginForm,
+        usernameInput: !!usernameInput,
+        passwordInput: !!passwordInput,
+        loginButton: !!loginButton
+    });
+
+    if (!loginForm) {
+        console.error('❌ Login form not found!');
+        return;
+    }
+
     // Check if already logged in
     checkAuthStatus();
 
     loginForm.addEventListener('submit', async (e) => {
+        console.log('📝 Form submit event triggered');
         e.preventDefault();
+        console.log('🛑 Default form submission prevented');
         await handleLogin();
     });
 
     async function checkAuthStatus() {
+        console.log('🔍 Checking auth status...');
         try {
-            const response = await fetch('/api/auth/check');
+            const response = await fetch('/api/auth/check', {
+                credentials: 'include'
+            });
             const data = await response.json();
+            console.log('🔍 Auth check result:', data);
             
             if (data.authenticated) {
+                console.log('✅ Already authenticated, redirecting to admin...');
                 window.location.href = '/admin';
+            } else {
+                console.log('❌ Not authenticated');
             }
         } catch (error) {
-            console.error('Error checking auth status:', error);
+            console.error('💥 Error checking auth status:', error);
         }
     }
 
