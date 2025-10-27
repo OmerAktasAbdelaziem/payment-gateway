@@ -41,7 +41,7 @@ router.post('/create-payment-link', async (req, res) => {
     );
 
     // Generate payment URL
-    const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
+    const baseUrl = process.env.BASE_URL || 'https://gateway.internationalitpro.com';
     const paymentUrl = `${baseUrl}/pay/${payment_link_id}`;
 
     res.json({
