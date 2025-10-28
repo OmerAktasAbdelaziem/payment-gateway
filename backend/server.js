@@ -60,19 +60,22 @@ const syncRoutes = require('./routes/sync');
 const authRoutes = require('./routes/auth');
 const { requireAuth, redirectIfAuthenticated } = require('./middleware/auth');
 
+// Health check endpoint (public - must be before protected routes)
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    message: 'Payment Gateway API is running',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
 // Auth routes (public)
 app.use('/api/auth', authRoutes);
 
 // Protected API routes - require authentication
 app.use('/api', requireAuth, paymentRoutes);
 app.use('/api', requireAuth, syncRoutes);
-
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    message: 'Payment Gateway API is running',
-    timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development'
   });
 });
