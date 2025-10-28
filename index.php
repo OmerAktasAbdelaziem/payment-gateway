@@ -2,14 +2,25 @@
 // PHP Proxy for Node.js Application
 // Forwards all requests to Node.js backend on port 3000
 
+// Error reporting for debugging (disable in production if not needed)
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+
 $nodeUrl = 'http://127.0.0.1:3000';
-$requestUri = $_SERVER['REQUEST_URI'];
+$requestUri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '/';
 
 // Build the target URL
 $url = $nodeUrl . $requestUri;
 
 // Initialize cURL
 $ch = curl_init($url);
+
+if ($ch === false) {
+    http_response_code(500);
+    echo 'Failed to initialize cURL';
+    exit;
+}
 
 // Configure cURL to capture headers
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -18,7 +29,7 @@ curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 
 // Forward the request method
-$method = $_SERVER['REQUEST_METHOD'];
+$method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET';
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
 
 // Forward POST/PUT data if present
@@ -29,18 +40,30 @@ if (in_array($method, ['POST', 'PUT', 'PATCH', 'DELETE'])) {
     }
 }
 
-// Forward headers (including cookies)
+// Forward headers (including cookies) - use fallback if getallheaders() not available
 $headers = [];
-foreach (getallheaders() as $key => $value) {
-    if (strtolower($key) !== 'host') {
-        $headers[] = "$key: $value";
+if (function_exists('getallheaders')) {
+    foreach (getallheaders() as $key => $value) {
+        if (strtolower($key) !== 'host') {
+            $headers[] = "$key: $value";
+        }
+    }
+} else {
+    // Fallback for servers without getallheaders()
+    foreach ($_SERVER as $key => $value) {
+        if (substr($key, 0, 5) === 'HTTP_') {
+            $header = str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower(substr($key, 5)))));
+            if (strtolower($header) !== 'host') {
+                $headers[] = "$header: $value";
+            }
+        }
     }
 }
 
 // Add X-Forwarded headers for proxy
-$headers[] = 'X-Forwarded-For: ' . $_SERVER['REMOTE_ADDR'];
+$headers[] = 'X-Forwarded-For: ' . (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '127.0.0.1');
 $headers[] = 'X-Forwarded-Proto: https';
-$headers[] = 'X-Forwarded-Host: ' . $_SERVER['HTTP_HOST'];
+$headers[] = 'X-Forwarded-Host: ' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'gateway.internationalitpro.com');
 
 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
