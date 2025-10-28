@@ -1,16 +1,26 @@
-# Route all requests through index.php (PHP Proxy)
+DirectoryIndex index.php
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /
     
-    # If the request is for index.php itself, serve it
-    RewriteRule ^index\.php$ - [L]
+    # Don't rewrite if accessing index.php directly
+    RewriteCond %{REQUEST_URI} ^/index\.php$
+    RewriteRule ^ - [L]
     
-    # If the file or directory exists, serve it directly
-    # This allows static files (CSS, JS, images) to be served
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
+    # Don't rewrite if file exists (images, CSS, JS, etc)
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
     
-    # Route everything else through index.php
-    RewriteRule ^(.*)$ index.php [QSA,L]
+    # Don't rewrite if directory exists
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+    
+    # Route everything else to index.php
+    RewriteRule ^ index.php [L]
 </IfModule>
+
+# Disable directory browsing
+Options -Indexes
+
+# Enable follow symlinks
+Options +FollowSymLinks

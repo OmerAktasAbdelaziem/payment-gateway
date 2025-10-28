@@ -15,7 +15,7 @@ module.exports = {
       DB_NAME: 'u402548537_gateway',
       DB_USER: 'u402548537_gateway',
       DB_PASSWORD: 'JustOmer2024$',
-      BASE_URL: 'https://gateway.internationalitpro.com'
+      BASE_URL: 'https://internationalitpro.com'
     }
   }]
 };

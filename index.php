@@ -1,104 +1,98 @@
 <?php
-// PHP Proxy for Node.js Application
-// Forwards all requests to Node.js backend on port 3000
+/**
+ * Ultra-Simple Node.js Proxy
+ * Forwards all requests to Node.js backend on port 3000
+ */
 
-// Error reporting for debugging (disable in production if not needed)
-error_reporting(E_ALL);
-ini_set('display_errors', 0);
-ini_set('log_errors', 1);
+// Configuration
+define('NODE_HOST', '127.0.0.1');
+define('NODE_PORT', '3000');
 
-$nodeUrl = 'http://127.0.0.1:3000';
-$requestUri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '/';
-
-// Build the target URL
-$url = $nodeUrl . $requestUri;
+// Get request details
+$method = $_SERVER['REQUEST_METHOD'];
+$uri = $_SERVER['REQUEST_URI'];
+$targetUrl = 'http://' . NODE_HOST . ':' . NODE_PORT . $uri;
 
 // Initialize cURL
-$ch = curl_init($url);
-
-if ($ch === false) {
-    http_response_code(500);
-    echo 'Failed to initialize cURL';
-    exit;
+$ch = curl_init($targetUrl);
+if (!$ch) {
+    header('HTTP/1.1 503 Service Unavailable');
+    die('Failed to initialize connection');
 }
 
-// Configure cURL to capture headers
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HEADER, true);  // Include headers in output
-curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+// Basic cURL options
+curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_HEADER => true,
+    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_TIMEOUT => 30,
+    CURLOPT_CUSTOMREQUEST => $method
+]);
 
-// Forward the request method
-$method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET';
-curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-
-// Forward POST/PUT data if present
+// Forward POST/PUT/PATCH/DELETE data
 if (in_array($method, ['POST', 'PUT', 'PATCH', 'DELETE'])) {
-    $postData = file_get_contents('php://input');
-    if ($postData) {
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+    $body = file_get_contents('php://input');
+    if ($body) {
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
     }
 }
 
-// Forward headers (including cookies) - use fallback if getallheaders() not available
-$headers = [];
+// Build headers array
+$forwardHeaders = [];
+
+// Forward all HTTP headers except Host
 if (function_exists('getallheaders')) {
-    foreach (getallheaders() as $key => $value) {
-        if (strtolower($key) !== 'host') {
-            $headers[] = "$key: $value";
-        }
-    }
-} else {
-    // Fallback for servers without getallheaders()
-    foreach ($_SERVER as $key => $value) {
-        if (substr($key, 0, 5) === 'HTTP_') {
-            $header = str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower(substr($key, 5)))));
-            if (strtolower($header) !== 'host') {
-                $headers[] = "$header: $value";
-            }
+    $headers = getallheaders();
+    foreach ($headers as $name => $value) {
+        if (strtolower($name) !== 'host') {
+            $forwardHeaders[] = "$name: $value";
         }
     }
 }
 
-// Add X-Forwarded headers for proxy
-$headers[] = 'X-Forwarded-For: ' . (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '127.0.0.1');
-$headers[] = 'X-Forwarded-Proto: https';
-$headers[] = 'X-Forwarded-Host: ' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'gateway.internationalitpro.com');
+// Add proxy headers
+$forwardHeaders[] = 'X-Forwarded-For: ' . ($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
+$forwardHeaders[] = 'X-Forwarded-Proto: https';
+$forwardHeaders[] = 'X-Forwarded-Host: ' . ($_SERVER['HTTP_HOST'] ?? 'gateway.internationalitpro.com');
 
-curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+curl_setopt($ch, CURLOPT_HTTPHEADER, $forwardHeaders);
 
-// Execute the request
+// Execute request
 $response = curl_exec($ch);
-$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-// Check for cURL errors
+// Handle errors
 if (curl_errno($ch)) {
     $error = curl_error($ch);
     curl_close($ch);
-    http_response_code(503);
-    echo 'Service Unavailable: ' . htmlspecialchars($error);
-    exit;
+    header('HTTP/1.1 503 Service Unavailable');
+    header('Content-Type: text/plain');
+    die('Service Unavailable: ' . $error);
 }
 
+// Get response details
+$statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+
 // Split headers and body
-$header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-$header_text = substr($response, 0, $header_size);
-$body = substr($response, $header_size);
+$responseHeaders = substr($response, 0, $headerSize);
+$responseBody = substr($response, $headerSize);
 
 curl_close($ch);
 
-// Parse and forward response headers
-$headers = explode("\r\n", $header_text);
-foreach ($headers as $header) {
+// Forward response headers
+$headerLines = explode("\r\n", trim($responseHeaders));
+foreach ($headerLines as $header) {
     $header = trim($header);
-    if (!empty($header) && strpos($header, 'HTTP/') !== 0 && strpos($header, 'Transfer-Encoding') === false) {
+    // Skip HTTP status line and Transfer-Encoding
+    if ($header && 
+        strpos($header, 'HTTP/') !== 0 && 
+        stripos($header, 'Transfer-Encoding:') !== 0) {
         header($header, false);
     }
 }
 
-// Set HTTP response code
-http_response_code($httpCode);
+// Set HTTP status code
+http_response_code($statusCode);
 
-// Output the body
-echo $body;
-?>
+// Output response body
+echo $responseBody;
