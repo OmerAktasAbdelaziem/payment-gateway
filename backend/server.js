@@ -76,9 +76,6 @@ app.use('/api/auth', authRoutes);
 // Protected API routes - require authentication
 app.use('/api', requireAuth, paymentRoutes);
 app.use('/api', requireAuth, syncRoutes);
-    environment: process.env.NODE_ENV || 'development'
-  });
-});
 
 // Serve frontend pages
 app.get('/', (req, res) => {
