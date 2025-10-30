@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Status - Payment Gateway</title>
+    <link rel="stylesheet" href="/css/login.css">
+    <style>
+        .status-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background: #f9fafb;
+        }
+        .status-ok { border-left: 4px solid #10b981; }
+        .status-error { border-left: 4px solid #ef4444; }
+        .check-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        .check-btn:hover { background: #5568d3; }
+        h1 { color: #333; margin-bottom: 30px; }
+        .success { color: #10b981; font-weight: bold; }
+        .error { color: #ef4444; font-weight: bold; }
+        .loading { color: #f59e0b; }
+    </style>
+</head>
+<body>
+    <div class="status-container">
+        <h1>🚀 Payment Gateway Status</h1>
+        
+        <div id="status-list">
+            <div class="status-item">
+                <span>Checking system...</span>
+                <span class="loading">⏳ Loading...</span>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <button class="check-btn" onclick="checkAll()">🔄 Refresh Status</button>
+            <button class="check-btn" onclick="window.location.href='/login'">🔐 Go to Login</button>
+            <button class="check-btn" onclick="window.location.href='/admin'">📊 Go to Admin</button>
+        </div>
+    </div>
+
+    <script>
+        async function checkAll() {
+            const statusList = document.getElementById('status-list');
+            statusList.innerHTML = '<div class="status-item"><span>Checking...</span><span class="loading">⏳</span></div>';
+
+            const checks = [
+                { name: 'PHP API Health', url: '/api/health', type: 'json' },
+                { name: 'CSS Loading', url: '/css/login.css', type: 'text' },
+                { name: 'JavaScript Loading', url: '/js/login.js', type: 'text' },
+                { name: 'Logo Image', url: '/images/logo.jpg', type: 'blob' },
+                { name: 'Stripe Config', url: '/api/stripe/config', type: 'json' },
+                { name: 'Auth Check', url: '/api/auth/check', type: 'json' }
+            ];
+
+            statusList.innerHTML = '';
+
+            for (const check of checks) {
+                const div = document.createElement('div');
+                div.className = 'status-item';
+                div.innerHTML = `<span>${check.name}</span><span class="loading">⏳ Testing...</span>`;
+                statusList.appendChild(div);
+
+                try {
+                    const response = await fetch(check.url, { credentials: 'include' });
+                    const status = response.ok ? 'success' : 'error';
+                    const statusText = response.ok ? `✅ OK (${response.status})` : `❌ Failed (${response.status})`;
+                    
+                    div.className = `status-item status-${status === 'success' ? 'ok' : 'error'}`;
+                    div.innerHTML = `<span>${check.name}</span><span class="${status}">${statusText}</span>`;
+
+                    // Show data for JSON responses
+                    if (check.type === 'json' && response.ok) {
+                        const data = await response.json();
+                        const preview = JSON.stringify(data).substring(0, 100);
+                        div.innerHTML += `<div style="font-size: 12px; color: #666; margin-top: 5px;">${preview}...</div>`;
+                    }
+                } catch (error) {
+                    div.className = 'status-item status-error';
+                    div.innerHTML = `<span>${check.name}</span><span class="error">❌ Error: ${error.message}</span>`;
+                }
+            }
+        }
+
+        // Auto-run on load
+        window.addEventListener('DOMContentLoaded', checkAll);
+    </script>
+</body>
+</html>

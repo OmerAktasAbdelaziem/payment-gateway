@@ -253,7 +253,7 @@ async function loadRecentTransactions() {
         tbody.innerHTML = recentPayments.map(payment => `
             <tr>
                 <td>${new Date(payment.created_at).toLocaleDateString()}</td>
-                <td><span class="transaction-id">${(payment.payment_link_id || '').substring(0, 12)}...</span></td>
+                <td><span class="transaction-id">${(payment.payment_id || '').substring(0, 16)}...</span></td>
                 <td>
                     <div class="customer-info">
                         <span class="customer-name">${payment.customer_name || 'N/A'}</span>
@@ -262,9 +262,8 @@ async function loadRecentTransactions() {
                 </td>
                 <td class="amount-cell">$${(payment.amount || 0).toFixed(2)} ${payment.currency || 'USD'}</td>
                 <td>${getStatusBadge(payment.status)}</td>
-                <td>${getUSDTBadge(payment.usdt_conversion_status)}</td>
                 <td>
-                    <button class="action-btn" onclick="viewPayment('${payment.payment_link_id}')">View</button>
+                    <button class="action-btn" onclick="window.open('${payment.payment_url}', '_blank')">View Link</button>
                 </td>
             </tr>
         `).join('');
@@ -322,7 +321,7 @@ async function generatePaymentLink() {
     submitBtn.querySelector('.btn-loader').style.display = 'inline';
 
     try {
-        const response = await fetch('/api/create-payment-link', {
+        const response = await fetch('/api/payments', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -332,6 +331,7 @@ async function generatePaymentLink() {
                 currency,
                 customer_email: customerEmail || null,
                 customer_name: customerName || null,
+                description: `Payment for ${customerName || 'Customer'}` || 'Payment'
             }),
         });
 
@@ -342,7 +342,7 @@ async function generatePaymentLink() {
         }
 
         // Show generated link
-        generatedPaymentUrl = data.payment_url;
+        generatedPaymentUrl = data.payment.payment_url;
         document.getElementById('payment-url').value = generatedPaymentUrl;
         document.getElementById('generated-link').style.display = 'block';
 
@@ -421,11 +421,8 @@ async function loadStats() {
         const response = await fetch('/api/payments');
         const data = await response.json();
 
-        if (!data.success) {
-            throw new Error('Failed to load stats');
-        }
-
-        const payments = data.payments;
+        // Handle both object with payments array and direct array
+        const payments = data.payments || data || [];
 
         // Calculate stats
         const completed = payments.filter(p => p.status === 'completed');
@@ -453,11 +450,10 @@ async function loadPayments() {
         const response = await fetch('/api/payments?limit=50');
         const data = await response.json();
 
-        if (!data.success) {
-            throw new Error('Failed to load payments');
-        }
-
-        allPayments = data.payments;
+        // Handle both object with payments array and direct array
+        const payments = data.payments || data || [];
+        
+        allPayments = payments;
         displayPayments(allPayments);
 
     } catch (error) {
@@ -479,7 +475,7 @@ function displayPayments(payments) {
     if (payments.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="6" style="text-align: center; padding: 40px; color: #64748b;">
+                <td colspan="5" style="text-align: center; padding: 40px; color: #64748b;">
                     No payments found
                 </td>
             </tr>
@@ -491,7 +487,7 @@ function displayPayments(payments) {
         <tr>
             <td>
                 <span style="font-family: 'Courier New', monospace; font-size: 12px;">
-                    ${payment.payment_link_id.substring(0, 16)}...
+                    ${payment.payment_id.substring(0, 16)}...
                 </span>
             </td>
             <td>
@@ -506,18 +502,12 @@ function displayPayments(payments) {
                 </span>
             </td>
             <td>
-                ${payment.usdt_amount 
-                    ? `${parseFloat(payment.usdt_amount).toFixed(2)} USDT` 
-                    : '-'
-                }
+                <span style="font-size: 12px; color: #64748b;">
+                    ${payment.customer_email || 'N/A'}
+                </span>
             </td>
             <td>
                 ${formatDate(payment.created_at)}
-            </td>
-            <td>
-                <button class="btn-icon" onclick="viewPayment('${payment.payment_id}')" title="View Details">
-                    👁️
-                </button>
             </td>
         </tr>
     `).join('');
@@ -627,4 +617,21 @@ function refreshData() {
     setTimeout(() => {
         btn.style.transform = '';
     }, 500);
+}
+
+// Copy to clipboard function
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert('✓ Payment link copied to clipboard!');
+    }).catch(err => {
+        console.error('Failed to copy:', err);
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        alert('✓ Payment link copied!');
+    });
 }

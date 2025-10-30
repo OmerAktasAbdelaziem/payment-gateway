@@ -1,0 +1,64 @@
+# Payment Gateway .htaccess
+# Routes API calls and serves static files
+
+DirectoryIndex index.html
+
+# Enable RewriteEngine
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # API Routes - Send to PHP backend
+    RewriteCond %{REQUEST_URI} ^/api/
+    RewriteRule ^api/(.*)$ php-backend/api.php [L,QSA]
+
+    # Payment page routes - /pay/{payment_id}
+    RewriteCond %{REQUEST_URI} ^/pay/
+    RewriteRule ^pay/([A-Z0-9_]+)$ frontend/payment.html [L]
+
+    # Admin routes
+    RewriteCond %{REQUEST_URI} ^/(login|admin|dashboard)$
+    RewriteRule ^(login|admin|dashboard)$ frontend/$1.html [L]
+
+    # Success and error pages
+    RewriteCond %{REQUEST_URI} ^/(success|error)$
+    RewriteRule ^(success|error)$ frontend/$1.html [L]
+
+    # Serve static files directly (CSS, JS, images)
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
+
+    # Frontend assets
+    RewriteCond %{REQUEST_URI} ^/(css|js|images)/
+    RewriteRule ^(.*)$ frontend/$1 [L]
+
+    # Default fallback to index
+    RewriteCond %{REQUEST_URI} !^/php-backend/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^.*$ frontend/index.html [L]
+</IfModule>
+
+# Security Headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Disable directory browsing
+Options -Indexes +FollowSymLinks
+
+# Protect sensitive files
+<FilesMatch "\.(env|log|sql|md)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# PHP Settings
+<IfModule mod_php.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+</IfModule>

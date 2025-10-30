@@ -361,6 +361,208 @@ input[type="email"]:focus {
     border: 2px solid #ef4444;
 }
 
+/* NOWPayments Specific Styles */
+.security-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.lock-icon {
+    font-size: 18px;
+}
+
+.payment-details {
+    padding: 30px;
+    background: white;
+}
+
+.amount-section {
+    text-align: center;
+    padding: 30px 0;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.amount-label {
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.amount-value {
+    color: #261444;
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-row .label {
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.detail-row .value {
+    color: #1e293b;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.payment-info-box {
+    margin: 0 30px 30px;
+    padding: 20px;
+    background: #f0f9ff;
+    border: 2px solid #bae6fd;
+    border-radius: 12px;
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.info-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.info-content h3 {
+    color: #0c4a6e;
+    font-size: 16px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.info-content p {
+    color: #075985;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.info-content p:last-child {
+    margin-bottom: 0;
+}
+
+.btn {
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #261444 0%, #df2439 100%);
+    color: white;
+    font-weight: 600;
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(223, 36, 57, 0.4);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background: #64748b;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+.btn-secondary:hover {
+    background: #475569;
+}
+
+.btn-large {
+    width: 100%;
+    padding: 18px;
+    font-size: 18px;
+    border-radius: 12px;
+    margin: 0 30px;
+    width: calc(100% - 60px);
+}
+
+.btn-text {
+    display: inline-block;
+}
+
+.btn-loader {
+    display: none;
+    font-size: 20px;
+}
+
+.btn-primary.loading .btn-text {
+    display: none;
+}
+
+.btn-primary.loading .btn-loader {
+    display: inline-block;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.payment-footer {
+    padding: 25px 30px 30px;
+    text-align: center;
+    background: white;
+}
+
+.powered-by {
+    color: #64748b;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.powered-by strong {
+    color: #261444;
+    font-weight: 700;
+}
+
+.secure-note {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
 @media (max-width: 600px) {
     body {
         padding: 10px;
@@ -375,8 +577,13 @@ input[type="email"]:focus {
     }
 
     .payment-info,
-    #payment-form {
+    #payment-form,
+    .payment-details {
         padding: 20px;
+    }
+
+    .amount-value {
+        font-size: 42px;
     }
 
     .amount {
@@ -389,5 +596,24 @@ input[type="email"]:focus {
 
     .badge {
         font-size: 11px;
+    }
+
+    .payment-info-box {
+        margin: 0 20px 20px;
+        padding: 15px;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .btn-large {
+        margin: 0 20px;
+        width: calc(100% - 40px);
+        padding: 16px;
+        font-size: 16px;
+    }
+
+    .payment-footer {
+        padding: 20px;
     }
 }

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Payment - Payment Gateway</title>
+    <link rel="stylesheet" href="/public/css/payment.css?v=2">
+    <style>
+        /* Critical CSS for immediate rendering */
+        .payment-details {
+            padding: 30px;
+            background: white;
+        }
+        .amount-section {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .amount-label {
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .amount-value {
+            color: #261444;
+            font-size: 56px;
+            font-weight: 700;
+            line-height: 1;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .detail-row .label {
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .detail-row .value {
+            color: #1e293b;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .payment-id {
+            font-family: 'Courier New', monospace;
+            font-size: 12px !important;
+            color: #64748b !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <!-- Loading State -->
+        <div id="loading-state" class="loading-state">
+            <div class="loader"></div>
+            <p>Loading payment details...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="error-state" style="display: none;">
+            <div class="error-icon">⚠️</div>
+            <h2>Payment Error</h2>
+            <p id="error-message">This payment link is invalid or has expired.</p>
+            <a href="/" class="btn btn-secondary">Return to Home</a>
+        </div>
+
+        <!-- Payment Info -->
+        <div id="payment-info" class="payment-card" style="display: none;">
+            <div class="payment-header">
+                <h1>Secure Payment</h1>
+                <div class="security-badge">
+                    <span class="lock-icon">🔒</span>
+                    <span>Secure Checkout</span>
+                </div>
+            </div>
+
+            <div class="payment-details">
+                <div class="amount-section">
+                    <div class="amount-label">Amount Due</div>
+                    <div class="amount-value" id="payment-amount">$0.00</div>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Payment ID</span>
+                    <span class="value payment-id" id="payment-id">...</span>
+                </div>
+            </div>
+
+            <div class="payment-info-box">
+                <div class="info-icon">ℹ️</div>
+                <div class="info-content">
+                    <h3>Payment Methods Accepted</h3>
+                    <p>You can pay with credit/debit cards or cryptocurrency (BTC, ETH, USDT, and 200+ more).</p>
+                    <p>All payments are processed securely by NOWPayments.</p>
+                </div>
+            </div>
+
+            <button 
+                id="submit-button" 
+                class="btn btn-primary btn-large" 
+                onclick="handlePayment()"
+            >
+                <span class="btn-text">Pay Now</span>
+                <span class="btn-loader" style="display: none;">⏳</span>
+            </button>
+
+            <div class="payment-footer">
+                <p class="powered-by">
+                    Powered by <strong>International Pro</strong>
+                </p>
+                <p class="secure-note">
+                    🔒 Your payment information is encrypted and secure
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/public/js/payment-nowpayments.js?v=2"></script>
+</body>
+</html>

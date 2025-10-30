@@ -40,10 +40,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Load payment details from backend
 async function loadPaymentDetails() {
     try {
-        const response = await fetch(`/api/payment/${paymentLinkId}`);
+        const response = await fetch(`/api/public/payment/${paymentLinkId}`);
         const data = await response.json();
 
-        if (!data.success) {
+        if (!response.ok || !data.payment) {
             throw new Error(data.error || 'Payment not found');
         }
 
@@ -158,14 +158,11 @@ async function handleSubmit(event) {
 // Create Payment Intent
 async function createPaymentIntent() {
     try {
-        const response = await fetch('/api/create-payment-intent', {
+        const response = await fetch(`/api/stripe/create-intent/${paymentLinkId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                payment_link_id: paymentLinkId,
-            }),
+            }
         });
 
         const data = await response.json();

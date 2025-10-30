@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment - Secure Checkout</title>
     <script src="https://js.stripe.com/v3/"></script>
-    <link rel="stylesheet" href="/css/payment.css">
+            <link rel="stylesheet" href="/css/payment.css">
+            <script type="module">
+                import { loadMoonPay } from 'https://cdn.jsdelivr.net/npm/@moonpay/moonpay-js/+esm';
+                window.loadMoonPay = loadMoonPay;
+            </script>
 </head>
 <body>
     <div class="payment-container">
@@ -36,21 +40,39 @@
                 <div class="form-section">
                     <label for="email">Email Address</label>
                     <input 
-                        type="email" 
-                        id="email" 
-                        placeholder="your@email.com" 
-                        required
-                        autocomplete="email"
-                    >
-                </div>
-
                 <div class="form-section">
-                    <label for="card-element">Card Information</label>
-                    <div id="card-element" class="card-element">
-                        <!-- Stripe Card Element will be inserted here -->
-                    </div>
+            <!-- CoinGate Payment Button -->
+            <div style="text-align:center; margin: 32px 0;">
+                <button id="coingate-btn" class="submit-button" style="font-size:20px; padding:18px 40px;">Pay with Card / Crypto (CoinGate)</button>
+            </div>
+            </form>
                     <div id="card-errors" class="card-errors"></div>
                 </div>
+    <script>
+    // Get payment link ID from URL
+    const urlPath = window.location.pathname;
+    const paymentLinkId = urlPath.split('/').pop();
+
+    // Fetch payment details and launch CoinGate payment
+    async function launchCoinGatePayment() {
+        try {
+            const response = await fetch(`/api/public/payment/${paymentLinkId}`);
+            const data = await response.json();
+            if (!data.payment) throw new Error('Payment not found');
+            // Create CoinGate order via backend
+            const orderRes = await fetch(`/api/coingate/create-order/${paymentLinkId}`, { method: 'POST' });
+            const orderData = await orderRes.json();
+            if (!orderData.success || !orderData.payment_url) throw new Error(orderData.error || 'Failed to create CoinGate order');
+            window.location.href = orderData.payment_url;
+        } catch (e) {
+            alert('Failed to start CoinGate payment: ' + e.message);
+        }
+    }
+    document.getElementById('coingate-btn').onclick = function(e) {
+        e.preventDefault();
+        launchCoinGatePayment();
+    };
+    </script>
 
                 <div class="security-badges">
                     <div class="badge">
