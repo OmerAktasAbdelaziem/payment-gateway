@@ -1,33 +1,25 @@
 <?php
 /**
- * Ultra-Simple Node.js Proxy
- * Forwards all requests to Node.js backend on port 3000
+ * Payment Page Router - PHP Only
+ * Handles /pay/{payment_id} routes
  */
 
-// Configuration
-define('NODE_HOST', '127.0.0.1');
-define('NODE_PORT', '3000');
+// Get the request URI
+$requestUri = $_SERVER['REQUEST_URI'];
+$path = parse_url($requestUri, PHP_URL_PATH);
 
-// Get request details
-$method = $_SERVER['REQUEST_METHOD'];
-$uri = $_SERVER['REQUEST_URI'];
-$targetUrl = 'http://' . NODE_HOST . ':' . NODE_PORT . $uri;
-
-// Initialize cURL
-$ch = curl_init($targetUrl);
-if (!$ch) {
-    header('HTTP/1.1 503 Service Unavailable');
-    die('Failed to initialize connection');
+// Check if this is a /pay/ route
+if (preg_match('#^/pay/([A-Z0-9_]+)$#', $path, $matches)) {
+    $paymentId = $matches[1];
+    
+    // Serve the payment page HTML
+    readfile(__DIR__ . '/pay.html');
+    exit;
 }
 
-// Basic cURL options
-curl_setopt_array($ch, [
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_HEADER => true,
-    CURLOPT_FOLLOWLOCATION => true,
-    CURLOPT_TIMEOUT => 30,
-    CURLOPT_CUSTOMREQUEST => $method
-]);
+// Otherwise, redirect to admin login
+header('Location: /admin-login.php');
+exit;
 
 // Forward POST/PUT/PATCH/DELETE data
 if (in_array($method, ['POST', 'PUT', 'PATCH', 'DELETE'])) {

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Payment - Buy Crypto</title>
+    <link rel="stylesheet" href="/css/payment.css">
+    <style>
+        .amount-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .amount-btn {
+            padding: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .amount-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .amount-btn:active {
+            transform: translateY(0);
+        }
+        
+        .crypto-selector {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .crypto-btn {
+            padding: 12px 30px;
+            margin: 0 10px;
+            font-size: 16px;
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .crypto-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .info-box {
+            background: #f0f4ff;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .wallet-input-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        
+        .wallet-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <div class="payment-card">
+            <div class="payment-header">
+                <div class="logo">
+                    <img src="/INTERNATIONAL%20PRO%20black.png" alt="International Pro Ltd" class="company-logo">
+                </div>
+                <h1>Quick Crypto Purchase</h1>
+                <p class="subtitle">Select amount and buy with your card</p>
+            </div>
+
+            <!-- Crypto Selection -->
+            <div class="crypto-selector">
+                <h3>Select Cryptocurrency:</h3>
+                <button class="crypto-btn active" data-crypto="BTC" data-symbol="bitcoin">
+                    ₿ Bitcoin (BTC)
+                </button>
+                <button class="crypto-btn" data-crypto="USDT" data-symbol="tether">
+                    💵 USDT (TRC20)
+                </button>
+            </div>
+
+            <!-- Wallet Address Input -->
+            <div class="wallet-input-section">
+                <label><strong>Your Wallet Address (Optional):</strong></label>
+                <input type="text" id="walletAddress" class="wallet-input" 
+                       placeholder="Enter your BTC wallet address (or add it on the payment page)">
+                <small style="color: #666; display: block; margin-top: 8px;">
+                    💡 You can also enter your wallet address on the payment page
+                </small>
+            </div>
+
+            <!-- Info Box -->
+            <div class="info-box">
+                <h3 style="margin-top: 0;">📱 How it works:</h3>
+                <p style="margin: 10px 0;">1. Select your crypto currency above</p>
+                <p style="margin: 10px 0;">2. Choose an amount below</p>
+                <p style="margin: 10px 0;">3. You'll be redirected to complete payment with card</p>
+                <p style="margin: 10px 0;">4. Crypto will be sent to your wallet</p>
+            </div>
+
+            <!-- Amount Selection -->
+            <h3 style="text-align: center; margin-top: 30px;">Select Amount (USD):</h3>
+            <div class="amount-grid">
+                <button class="amount-btn" data-amount="100">$100</button>
+                <button class="amount-btn" data-amount="150">$150</button>
+                <button class="amount-btn" data-amount="200">$200</button>
+                <button class="amount-btn" data-amount="250">$250</button>
+                <button class="amount-btn" data-amount="300">$300</button>
+                <button class="amount-btn" data-amount="350">$350</button>
+                <button class="amount-btn" data-amount="400">$400</button>
+                <button class="amount-btn" data-amount="450">$450</button>
+                <button class="amount-btn" data-amount="500">$500</button>
+                <button class="amount-btn" data-amount="550">$550</button>
+                <button class="amount-btn" data-amount="1000">$1,000</button>
+                <button class="amount-btn" data-amount="1500">$1,500</button>
+                <button class="amount-btn" data-amount="2000">$2,000</button>
+                <button class="amount-btn" data-amount="5000">$5,000</button>
+                <button class="amount-btn" data-amount="8000">$8,000</button>
+                <button class="amount-btn" data-amount="10000">$10,000</button>
+            </div>
+
+            <div class="security-badges" style="margin-top: 30px;">
+                <div class="badge">
+                    <svg width="20" height="20" fill="#10b981" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 1l7 3v5c0 5-3 9-7 11-4-2-7-6-7-11V4l7-3z"/>
+                    </svg>
+                    <span>Secure Payment</span>
+                </div>
+                <div class="badge">
+                    <svg width="20" height="20" fill="#10b981" viewBox="0 0 20 20">
+                        <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v-2h2v2zm0-4H9V5h2v4z"/>
+                    </svg>
+                    <span>Card Payments</span>
+                </div>
+                <div class="badge">
+                    <svg width="20" height="20" fill="#10b981" viewBox="0 0 20 20">
+                        <path d="M3 4h14a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1z"/>
+                    </svg>
+                    <span>Instant Delivery</span>
+                </div>
+            </div>
+
+            <p style="text-align: center; color: #666; margin-top: 20px; font-size: 14px;">
+                Powered by INTERNATIONAL PRO
+            </p>
+        </div>
+    </div>
+
+    <script>
+        let selectedCrypto = 'BTC';
+        let selectedSymbol = 'bitcoin';
+        
+        // Crypto selection
+        document.querySelectorAll('.crypto-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.crypto-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                selectedCrypto = this.dataset.crypto;
+                selectedSymbol = this.dataset.symbol;
+                
+                // Update wallet placeholder
+                const walletInput = document.getElementById('walletAddress');
+                if (selectedCrypto === 'USDT') {
+                    walletInput.placeholder = 'Enter your USDT (TRC20) wallet address';
+                } else {
+                    walletInput.placeholder = 'Enter your BTC wallet address';
+                }
+            });
+        });
+        
+        // Amount selection and redirect
+        document.querySelectorAll('.amount-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const amount = this.dataset.amount;
+                const walletAddress = document.getElementById('walletAddress').value.trim();
+                
+                // Generate payment URL based on selected crypto and provider
+                let paymentUrl;
+                
+                if (selectedCrypto === 'BTC') {
+                    // MoonPay for BTC - most reliable
+                    paymentUrl = `https://buy.moonpay.com?apiKey=pk_live_default&currencyCode=btc&baseCurrencyAmount=${amount}&baseCurrencyCode=usd`;
+                    if (walletAddress) {
+                        paymentUrl += `&walletAddress=${encodeURIComponent(walletAddress)}`;
+                    }
+                    paymentUrl += `&redirectURL=${encodeURIComponent('https://internationalitpro.com/success.html')}`;
+                } else if (selectedCrypto === 'USDT') {
+                    // Paybis for USDT TRC20 - works well with URL parameters
+                    paymentUrl = `https://paybis.com/buy-usdt-trc20/?fiatAmount=${amount}&fiatCurrency=USD`;
+                    if (walletAddress) {
+                        paymentUrl += `&cryptoAddress=${encodeURIComponent(walletAddress)}`;
+                    }
+                }
+                
+                // Redirect to payment page
+                window.location.href = paymentUrl;
+            });
+        });
+    </script>
+</body>
+</html>

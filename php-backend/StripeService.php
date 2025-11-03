@@ -8,16 +8,74 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
+use Stripe\Checkout\Session;
 use Stripe\Exception\ApiErrorException;
 
 class StripeService {
-    private $db;
     
     public function __construct() {
-        $this->db = Database::getInstance();
-        
         // Set Stripe API key
         Stripe::setApiKey(STRIPE_SECRET_KEY);
+    }
+    
+    /**
+     * Create Stripe Checkout Session
+     */
+    public function createCheckoutSession($paymentId, $amount, $currency, $description) {
+        try {
+            // Convert amount to cents/smallest currency unit
+            $amountInCents = intval($amount * 100);
+            
+            // Create Checkout Session
+            $session = Session::create([
+                'payment_method_types' => ['card'],
+                'line_items' => [[
+                    'price_data' => [
+                        'currency' => strtolower($currency),
+                        'product_data' => [
+                            'name' => $description ?: 'Payment',
+                            'description' => 'Payment ID: ' . $paymentId,
+                        ],
+                        'unit_amount' => $amountInCents,
+                    ],
+                    'quantity' => 1,
+                ]],
+                'mode' => 'payment',
+                'success_url' => BASE_URL . '/payment-success.html?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => BASE_URL . '/pay/' . $paymentId . '?cancelled=1',
+                'metadata' => [
+                    'payment_link_id' => $paymentId
+                ],
+            ]);
+            
+            return [
+                'success' => true,
+                'sessionId' => $session->id,
+                'url' => $session->url
+            ];
+        } catch (ApiErrorException $e) {
+            error_log("Stripe Checkout Session creation failed: " . $e->getMessage());
+            return [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+    
+    /**
+     * Verify Stripe Webhook
+     */
+    public function verifyWebhook($payload, $signature) {
+        try {
+            return \Stripe\Webhook::constructEvent(
+                $payload,
+                $signature,
+                STRIPE_WEBHOOK_SECRET
+            );
+        } catch (\Exception $e) {
+            error_log("Webhook verification failed: " . $e->getMessage());
+            return null;
+        }
     }
     
     /**

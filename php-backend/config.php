@@ -1,5 +1,3 @@
-// CoinGate Configuration
-define('COINGATE_API_TOKEN', getenv('COINGATE_API_TOKEN'));
 <?php
 /**
  * Configuration File
@@ -70,6 +68,14 @@ define('AUTO_CONVERT_TO_USDT', getenv('AUTO_CONVERT_TO_USDT') === 'true');
 // BTC Configuration
 define('BTC_WALLET_ADDRESS', getenv('BTC_WALLET_ADDRESS'));
 define('PAYOUT_CURRENCY', getenv('PAYOUT_CURRENCY') ?: 'btc');
+
+// Cryptomus Configuration (MAIN PAYMENT METHOD)
+define('CRYPTOMUS_MERCHANT_ID', getenv('CRYPTOMUS_MERCHANT_ID'));
+define('CRYPTOMUS_PAYMENT_API_KEY', getenv('CRYPTOMUS_PAYMENT_API_KEY'));
+define('CRYPTOMUS_PAYOUT_API_KEY', getenv('CRYPTOMUS_PAYOUT_API_KEY'));
+
+// CoinGate Configuration (BACKUP)
+define('COINGATE_API_TOKEN', getenv('COINGATE_API_TOKEN'));
 
 // Application Configuration
 define('BASE_URL', getenv('BASE_URL') ?: 'http://localhost');

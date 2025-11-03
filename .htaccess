@@ -3,6 +3,22 @@ DirectoryIndex index.php
 <IfModule mod_rewrite.c>
     RewriteEngine On
     
+    # API Routes - Public (no auth)
+    RewriteCond %{REQUEST_URI} ^/api/public/
+    RewriteRule ^api/public/(.*)$ php-backend/public-api.php [L,QSA]
+    
+    # API Routes - Stripe
+    RewriteCond %{REQUEST_URI} ^/api/stripe/
+    RewriteRule ^api/stripe/(.*)$ php-backend/stripe.php [L,QSA]
+    
+    # API Routes - Cryptomus
+    RewriteCond %{REQUEST_URI} ^/api/cryptomus/
+    RewriteRule ^api/cryptomus/(.*)$ php-backend/cryptomus.php [L,QSA]
+    
+    # API Routes - CoinGate
+    RewriteCond %{REQUEST_URI} ^/api/coingate/
+    RewriteRule ^api/coingate/(.*)$ php-backend/coingate.php [L,QSA]
+    
     # Don't rewrite if accessing index.php directly
     RewriteCond %{REQUEST_URI} ^/index\.php$
     RewriteRule ^ - [L]

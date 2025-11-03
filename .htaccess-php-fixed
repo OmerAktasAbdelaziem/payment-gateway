@@ -9,6 +9,8 @@ DirectoryIndex index.html
     RewriteBase /
 
     # API Routes - Send to PHP backend
+    RewriteCond %{REQUEST_URI} ^/api/coinbase/
+    RewriteRule ^api/coinbase/(.*)$ php-backend/coinbase.php [L,QSA]
     RewriteCond %{REQUEST_URI} ^/api/coingate/
     RewriteRule ^api/coingate/(.*)$ php-backend/coingate.php [L,QSA]
     RewriteCond %{REQUEST_URI} ^/api/

@@ -131,7 +131,7 @@ class Payment {
     /**
      * Update payment status
      */
-    public function updateStatus($paymentId, $status, $stripePaymentIntentId = null) {
+    public function updateStatus($paymentId, $status, $stripePaymentIntentId = null, $metadata = null) {
         $validStatuses = ['pending', 'processing', 'completed', 'failed', 'cancelled'];
         if (!in_array($status, $validStatuses)) {
             throw new Exception("Invalid status");
@@ -143,6 +143,11 @@ class Payment {
         if ($stripePaymentIntentId) {
             $sql .= ", stripe_payment_intent_id = ?";
             $params[] = $stripePaymentIntentId;
+        }
+        
+        if ($metadata !== null) {
+            $sql .= ", metadata = ?";
+            $params[] = json_encode($metadata);
         }
         
         if ($status === 'completed') {
@@ -227,6 +232,8 @@ class Payment {
             'customer_phone' => $payment['customer_phone'],
             'status' => $payment['status'],
             'stripe_payment_intent_id' => $payment['stripe_payment_intent_id'],
+            'payment_method' => $payment['payment_method'] ?? null,
+            'metadata' => !empty($payment['metadata']) ? json_decode($payment['metadata'], true) : null,
             'payment_url' => BASE_URL . '/pay/' . $payment['payment_id'],
             'created_at' => $payment['created_at'],
             'updated_at' => $payment['updated_at'],

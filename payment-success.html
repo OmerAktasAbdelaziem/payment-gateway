@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - INTERNATIONAL PRO</title>
+    <link rel="stylesheet" href="/css/payment.css">
+    <style>
+        .success-container {
+            max-width: 600px;
+            margin: 80px auto;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .success-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: scaleIn 0.5s ease-out;
+        }
+        
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .success-title {
+            color: #10b981;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .success-message {
+            color: #6b7280;
+            font-size: 18px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .payment-details {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+        
+        .detail-value {
+            color: #1f2937;
+            font-weight: 600;
+        }
+        
+        .home-button {
+            background: linear-gradient(135deg, #df2439 0%, #261444 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .home-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(223, 36, 57, 0.3);
+        }
+        
+        .checkmark {
+            display: inline-block;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #10b981;
+            color: white;
+            font-size: 50px;
+            line-height: 80px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <div class="payment-card success-container">
+            <div class="checkmark">✓</div>
+            <h1 class="success-title">Payment Successful!</h1>
+            <p class="success-message">
+                Thank you for your payment. Your transaction has been completed successfully.
+            </p>
+            
+            <div class="payment-details" id="payment-details">
+                <div class="detail-row">
+                    <span class="detail-label">Status:</span>
+                    <span class="detail-value" style="color: #10b981;">✓ Paid</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Payment ID:</span>
+                    <span class="detail-value" id="session-id">Loading...</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Date:</span>
+                    <span class="detail-value" id="payment-date">-</span>
+                </div>
+            </div>
+            
+            <p style="color: #6b7280; font-size: 14px; margin-top: 20px;">
+                You will receive a confirmation email shortly.
+            </p>
+            
+            <a href="/" class="home-button">Return to Home</a>
+        </div>
+    </div>
+    
+    <script>
+        // Get session ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session_id');
+        
+        if (sessionId) {
+            document.getElementById('session-id').textContent = sessionId.substring(0, 30) + '...';
+        }
+        
+        // Set current date
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('en-GB', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        document.getElementById('payment-date').textContent = dateStr;
+    </script>
+</body>
+</html>

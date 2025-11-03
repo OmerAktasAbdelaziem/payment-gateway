@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Payment - Secure Checkout</title>
     <script src="https://js.stripe.com/v3/"></script>
-            <link rel="stylesheet" href="/css/payment.css">
+            <link rel="stylesheet" href="/css/payment.css?v=2">
             <script type="module">
                 import { loadMoonPay } from 'https://cdn.jsdelivr.net/npm/@moonpay/moonpay-js/+esm';
                 window.loadMoonPay = loadMoonPay;
@@ -35,76 +38,260 @@
                 </div>
             </div>
 
-            <!-- Payment Form -->
-            <form id="payment-form">
-                <div class="form-section">
-                    <label for="email">Email Address</label>
-                    <input 
-                <div class="form-section">
-            <!-- CoinGate Payment Button -->
-            <div style="text-align:center; margin: 32px 0;">
-                <button id="coingate-btn" class="submit-button" style="font-size:20px; padding:18px 40px;">Pay with Card / Crypto (CoinGate)</button>
-            </div>
-            </form>
-                    <div id="card-errors" class="card-errors"></div>
+            <!-- Credit Card Form -->
+            <form id="payment-form" style="margin: 32px 0;">
+                <div id="card-element" style="padding: 15px; border: 2px solid #e5e7eb; border-radius: 10px; background: white; margin-bottom: 20px;">
+                    <!-- Stripe Card Element will be inserted here -->
                 </div>
-    <script>
-    // Get payment link ID from URL
-    const urlPath = window.location.pathname;
-    const paymentLinkId = urlPath.split('/').pop();
-
-    // Fetch payment details and launch CoinGate payment
-    async function launchCoinGatePayment() {
-        try {
-            const response = await fetch(`/api/public/payment/${paymentLinkId}`);
-            const data = await response.json();
-            if (!data.payment) throw new Error('Payment not found');
-            // Create CoinGate order via backend
-            const orderRes = await fetch(`/api/coingate/create-order/${paymentLinkId}`, { method: 'POST' });
-            const orderData = await orderRes.json();
-            if (!orderData.success || !orderData.payment_url) throw new Error(orderData.error || 'Failed to create CoinGate order');
-            window.location.href = orderData.payment_url;
-        } catch (e) {
-            alert('Failed to start CoinGate payment: ' + e.message);
-        }
-    }
-    document.getElementById('coingate-btn').onclick = function(e) {
-        e.preventDefault();
-        launchCoinGatePayment();
-    };
-    </script>
-
-                <div class="security-badges">
-                    <div class="badge">
-                        <svg width="20" height="20" fill="#10b981" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 1l7 3v5c0 5-3 9-7 11-4-2-7-6-7-11V4l7-3z"/>
+                
+                <div id="card-errors" role="alert" style="color: #dc2626; font-size: 14px; margin-bottom: 15px; display: none;"></div>
+                
+                <button type="submit" id="submit-payment" class="submit-button" style="width: 100%; font-size:18px; padding:16px 40px;">
+                    <span id="button-text">💳 Pay Now</span>
+                    <span id="button-spinner" style="display: none;">
+                        <svg style="display: inline-block; vertical-align: middle; width: 20px; height: 20px; animation: spin 1s linear infinite;" viewBox="0 0 24 24">
+                            <circle style="opacity: 0.25;" cx="12" cy="12" r="10" stroke="white" stroke-width="4" fill="none"></circle>
+                            <path style="opacity: 0.75;" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        <span>Secure Payment</span>
-                    </div>
-                    <div class="badge">
-                        <svg width="20" height="20" fill="#10b981" viewBox="0 0 20 20">
-                            <path d="M10 2a6 6 0 100 12 6 6 0 000-12zM9 9V6h2v3h3v2h-3v3H9v-3H6V9h3z"/>
-                        </svg>
-                        <span>Encrypted</span>
-                    </div>
-                    <div class="badge">
-                        <span>🔒 SSL Secured</span>
-                    </div>
-                </div>
-
-                <button type="submit" id="submit-button" class="submit-button">
-                    <span class="button-text">Pay Now</span>
-                    <span class="button-loader" style="display: none;">
-                        <svg class="spinner" viewBox="0 0 50 50">
-                            <circle cx="25" cy="25" r="20" fill="none" stroke="white" stroke-width="4"></circle>
-                        </svg>
+                        Processing...
                     </span>
                 </button>
-
-                <div class="form-footer">
-                    <p>Powered by INTERNATIONAL PRO</p>
-                </div>
             </form>
+            
+            <style>
+                @keyframes spin {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+                
+                #payment-form {
+                    max-width: 100%;
+                }
+                
+                .StripeElement {
+                    padding: 15px;
+                }
+                
+                .StripeElement--focus {
+                    border-color: #df2439;
+                    box-shadow: 0 0 0 3px rgba(223, 36, 57, 0.1);
+                }
+                
+                .StripeElement--invalid {
+                    border-color: #dc2626;
+                }
+            </style>
+
+            <div class="security-badges">
+                <div class="badge">
+                    <svg width="20" height="20" fill="#10b981" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 1l7 3v5c0 5-3 9-7 11-4-2-7-6-7-11V4l7-3z"/>
+                    </svg>
+                    <span>Secure Payment</span>
+                </div>
+                <div class="badge">
+                    <svg width="20" height="20" fill="#10b981" viewBox="0 0 20 20">
+                        <path d="M10 2a6 6 0 100 12 6 6 0 000-12zM9 9V6h2v3h3v2h-3v3H9v-3H6V9h3z"/>
+                    </svg>
+                    <span>Encrypted</span>
+                </div>
+                <div class="badge">
+                    <span>🔒 SSL Secured</span>
+                </div>
+            </div>
+
+            <div class="form-footer">
+                <p>Powered by INTERNATIONAL PRO</p>
+            </div>
+
+            <script>
+            // Get payment link ID from URL
+            const urlPath = window.location.pathname;
+            const paymentLinkId = urlPath.split('/').pop();
+
+            // Load payment details
+            async function loadPaymentDetails() {
+                try {
+                    const response = await fetch(`/api/public/payment/${paymentLinkId}`);
+                    const data = await response.json();
+                    
+                    if (!data.payment) {
+                        throw new Error('Payment not found');
+                    }
+                    
+                    const payment = data.payment;
+                    
+                    // Update payment info display
+                    document.getElementById('payment-amount').textContent = 
+                        new Intl.NumberFormat('en-US', { 
+                            style: 'currency', 
+                            currency: payment.currency 
+                        }).format(payment.amount);
+                    
+                    document.getElementById('payment-id').textContent = payment.payment_id;
+                    
+                    // Store amount for FinchPay
+                    paymentAmount = payment.amount;
+                    paymentCurrency = payment.currency;
+                    
+                    // Hide loading, show content
+                    document.querySelector('.payment-card').style.display = 'block';
+                    document.getElementById('loading-state').style.display = 'none';
+                    
+                } catch (error) {
+                    console.error('Error loading payment:', error);
+                    document.getElementById('loading-state').style.display = 'none';
+                    document.getElementById('error-state').style.display = 'block';
+                    document.getElementById('error-message').textContent = error.message;
+                }
+            }
+
+            // FinchPay configuration
+            let paymentAmount = 0;
+            let paymentCurrency = 'USD';
+            
+            // Initialize Stripe Elements
+            const stripe = Stripe('pk_live_51SLloUHqjjklN91QgrNhnuuj8zp0krta23PgSpivWHwbjiSS0qfoMj31h5ceHWTlvMzjnjlZBMBJzYPw1pU6yYR200JdyzGzcx');
+            let elements;
+            let cardElement;
+            let clientSecret;
+            
+            // Initialize card element
+            function initializeStripeElements() {
+                const appearance = {
+                    theme: 'stripe',
+                    variables: {
+                        colorPrimary: '#df2439',
+                        colorBackground: '#ffffff',
+                        colorText: '#1f2937',
+                        colorDanger: '#dc2626',
+                        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif',
+                        spacingUnit: '4px',
+                        borderRadius: '8px',
+                    },
+                    rules: {
+                        '.Input': {
+                            border: '1px solid #e5e7eb',
+                            boxShadow: 'none',
+                        },
+                        '.Input:focus': {
+                            border: '1px solid #df2439',
+                            boxShadow: '0 0 0 3px rgba(223, 36, 57, 0.1)',
+                        },
+                    }
+                };
+                
+                elements = stripe.elements({ appearance });
+                cardElement = elements.create('card', {
+                    style: {
+                        base: {
+                            fontSize: '16px',
+                            color: '#1f2937',
+                            '::placeholder': {
+                                color: '#9ca3af',
+                            },
+                        },
+                    },
+                    hidePostalCode: false,
+                });
+                cardElement.mount('#card-element');
+                
+                // Show validation errors
+                cardElement.on('change', function(event) {
+                    const displayError = document.getElementById('card-errors');
+                    if (event.error) {
+                        displayError.textContent = event.error.message;
+                        displayError.style.display = 'block';
+                    } else {
+                        displayError.textContent = '';
+                        displayError.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Handle form submission
+            async function handlePaymentSubmit(event) {
+                event.preventDefault();
+                
+                if (paymentAmount === 0) {
+                    alert('Payment amount not loaded yet. Please wait...');
+                    return;
+                }
+                
+                setLoading(true);
+                
+                try {
+                    // Update status to processing
+                    await fetch(`/api/public/payment/${paymentLinkId}/processing`, {
+                        method: 'POST'
+                    });
+                    
+                    // Create payment intent
+                    const response = await fetch(`/api/stripe/create-payment-intent/${paymentLinkId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (!data.success) {
+                        throw new Error(data.error || 'Failed to create payment');
+                    }
+                    
+                    clientSecret = data.clientSecret;
+                    
+                    // Confirm payment with card details
+                    const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+                        payment_method: {
+                            card: cardElement,
+                        }
+                    });
+                    
+                    if (error) {
+                        throw new Error(error.message);
+                    }
+                    
+                    if (paymentIntent.status === 'succeeded') {
+                        // Payment successful!
+                        window.location.href = '/payment-success.html?payment_id=' + paymentLinkId;
+                    }
+                    
+                } catch (e) {
+                    const displayError = document.getElementById('card-errors');
+                    displayError.textContent = e.message;
+                    displayError.style.display = 'block';
+                    setLoading(false);
+                }
+            }
+            
+            // Show/hide loading state
+            function setLoading(isLoading) {
+                const submitButton = document.getElementById('submit-payment');
+                const buttonText = document.getElementById('button-text');
+                const buttonSpinner = document.getElementById('button-spinner');
+                
+                if (isLoading) {
+                    submitButton.disabled = true;
+                    buttonText.style.display = 'none';
+                    buttonSpinner.style.display = 'inline-block';
+                } else {
+                    submitButton.disabled = false;
+                    buttonText.style.display = 'inline-block';
+                    buttonSpinner.style.display = 'none';
+                }
+            }
+            
+            // Setup form handler
+            document.getElementById('payment-form').addEventListener('submit', handlePaymentSubmit);
+
+            // Load payment details and initialize Stripe
+            loadPaymentDetails().then(() => {
+                // Initialize Stripe Elements after payment details loaded
+                initializeStripeElements();
+            });
+            </script>
 
             <!-- Loading State -->
             <div id="loading-state" class="loading-state">
@@ -124,7 +311,5 @@
         <!-- Payment Status Messages -->
         <div id="status-message" class="status-message" style="display: none;"></div>
     </div>
-
-    <script src="/js/payment.js"></script>
 </body>
 </html>
